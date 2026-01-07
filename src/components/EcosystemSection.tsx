@@ -1,4 +1,5 @@
 import { Sprout, Droplets, Heart, RefreshCw, Shield, Zap } from "lucide-react";
+import AnimatedSection, { StaggerContainer, StaggerItem, ScaleIn } from "@/components/AnimatedSection";
 
 const EcosystemSection = () => {
   const ecosystemLayers = [
@@ -46,7 +47,7 @@ const EcosystemSection = () => {
 
       <div className="container mx-auto px-6 relative z-10">
         {/* Section Header */}
-        <div className="max-w-3xl mx-auto text-center mb-20">
+        <AnimatedSection className="max-w-3xl mx-auto text-center mb-20">
           <span className="text-sm font-medium text-accent uppercase tracking-wider">
             The Ecosystem
           </span>
@@ -58,17 +59,19 @@ const EcosystemSection = () => {
             A multi-layered ecosystem connecting land, oceans, health, and circular 
             economies into coherent regenerative infrastructure.
           </p>
-        </div>
+        </AnimatedSection>
 
         {/* Main Ecosystem Visualization */}
         <div className="relative max-w-5xl mx-auto">
           {/* Central Hub */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 md:w-40 md:h-40 rounded-full bg-gradient-to-br from-forest to-ocean shadow-glow z-20 flex items-center justify-center">
-            <div className="text-center">
-              <span className="font-serif text-lg md:text-xl text-background font-medium">Atlas</span>
-              <span className="block font-serif text-xs md:text-sm text-background/80">Sanctum</span>
+          <ScaleIn className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20">
+            <div className="w-32 h-32 md:w-40 md:h-40 rounded-full bg-gradient-to-br from-forest to-ocean shadow-glow flex items-center justify-center">
+              <div className="text-center">
+                <span className="font-serif text-lg md:text-xl text-background font-medium">Atlas</span>
+                <span className="block font-serif text-xs md:text-sm text-background/80">Sanctum</span>
+              </div>
             </div>
-          </div>
+          </ScaleIn>
 
           {/* Connecting Lines (visible on larger screens) */}
           <div className="hidden lg:block absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px]">
@@ -86,9 +89,9 @@ const EcosystemSection = () => {
           </div>
 
           {/* Ecosystem Cards */}
-          <div className="grid grid-cols-2 gap-6 md:gap-12 lg:gap-20">
+          <StaggerContainer className="grid grid-cols-2 gap-6 md:gap-12 lg:gap-20">
             {ecosystemLayers.map((layer, index) => (
-              <div
+              <StaggerItem
                 key={layer.title}
                 className={`${
                   index % 2 === 0 ? "lg:justify-self-end" : "lg:justify-self-start"
@@ -101,13 +104,13 @@ const EcosystemSection = () => {
                   <h3 className="font-serif text-xl mb-2">{layer.title}</h3>
                   <p className="text-sm text-muted-foreground">{layer.description}</p>
                 </div>
-              </div>
+              </StaggerItem>
             ))}
-          </div>
+          </StaggerContainer>
         </div>
 
         {/* Additional Capabilities */}
-        <div className="mt-20 grid md:grid-cols-2 gap-6 max-w-3xl mx-auto">
+        <AnimatedSection delay={0.3} className="mt-20 grid md:grid-cols-2 gap-6 max-w-3xl mx-auto">
           {capabilities.map((cap) => (
             <div
               key={cap.title}
@@ -122,7 +125,7 @@ const EcosystemSection = () => {
               </div>
             </div>
           ))}
-        </div>
+        </AnimatedSection>
       </div>
     </section>
   );
