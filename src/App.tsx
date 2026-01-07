@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/hooks/useAuth";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import EcosystemNavigation from "@/components/EcosystemNavigation";
+import NewsletterFloating from "@/components/NewsletterFloating";
 import EnhancedIndex from "./pages/EnhancedIndex";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
@@ -46,6 +47,7 @@ import AdvancedAnalytics from "./pages/AdvancedAnalytics";
 import CarbonMarketplace from "./pages/CarbonMarketplace";
 import APIMarketplace from "./pages/APIMarketplace";
 import SystemMonitoring from "./pages/SystemMonitoring";
+import NewsletterAdmin from "./pages/NewsletterAdmin";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient({
@@ -83,6 +85,7 @@ const App = () => (
               <Route path="/carbon-marketplace" element={<CarbonMarketplace />} />
               <Route path="/api-marketplace" element={<APIMarketplace />} />
               <Route path="/system-monitoring" element={<SystemMonitoring />} />
+              <Route path="/newsletter-admin" element={<NewsletterAdmin />} />
               
               {/* Main Application Routes */}
               <Route path="/dashboard" element={<><EcosystemNavigation /><div className="md:ml-80"><Dashboard /></div></>} />
@@ -115,6 +118,7 @@ const App = () => (
               
               <Route path="*" element={<NotFound />} />
             </Routes>
+            <NewsletterFloating />
           </BrowserRouter>
         </TooltipProvider>
       </AuthProvider>

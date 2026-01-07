@@ -7,10 +7,18 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import UserFlowLayout from '@/components/UserFlowLayout';
 import { 
   Sprout, TrendingUp, DollarSign, Users, Target, 
-  Calendar, Award, Bell, Plus, Eye, Edit 
+  Calendar, Award, Bell, Plus, Eye, Edit, MapPin,
+  Activity, BarChart3, Droplets, Bug, Leaf
 } from 'lucide-react';
 
 export default function PractitionerDashboardFlow() {
+  // Key Metrics Data for Regenerative Practitioners
+  const keyMetrics = {
+    hectaresManaged: 1250,
+    co2Sequestered: 450,
+    annualRevenue: 132000,
+    biodiversityIndex: 8.7
+  };
   const [projects, setProjects] = useState([
     {
       id: '1',
@@ -41,11 +49,11 @@ export default function PractitionerDashboardFlow() {
   ]);
 
   const [impactMetrics] = useState({
-    totalCarbonSequestered: 14.6,
+    totalCarbonSequestered: keyMetrics.co2Sequestered,
     soilHealthImprovement: 23,
     biodiversityIncrease: 18,
     communityMembers: 156,
-    fundingReceived: 53000,
+    fundingReceived: keyMetrics.annualRevenue,
     projectsActive: 2
   });
 
@@ -55,8 +63,8 @@ export default function PractitionerDashboardFlow() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Practitioner Dashboard</h1>
-            <p className="text-gray-600">Welcome back, Sarah! Track your regenerative impact.</p>
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Regenerative Practitioner Dashboard</h1>
+            <p className="text-gray-600">Fair value for real-world impact and measurable restoration</p>
           </div>
           <div className="flex gap-3">
             <Button variant="outline" size="sm">
@@ -70,15 +78,16 @@ export default function PractitionerDashboardFlow() {
           </div>
         </div>
 
-        {/* Impact Overview */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+        {/* Key Metrics - Dashboard Features */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <Card className="bg-white/70 backdrop-blur-sm border-white/20">
             <CardContent className="p-4">
               <div className="flex items-center gap-2">
-                <Sprout className="h-5 w-5 text-green-600" />
+                <MapPin className="h-5 w-5 text-green-600" />
                 <div>
-                  <p className="text-xs text-gray-600">Carbon Sequestered</p>
-                  <p className="text-lg font-bold">{impactMetrics.totalCarbonSequestered} tCO₂</p>
+                  <p className="text-xs text-gray-600">Hectares Managed</p>
+                  <p className="text-lg font-bold">{keyMetrics.hectaresManaged.toLocaleString()}+</p>
+                  <p className="text-xs text-green-600">+125 this quarter</p>
                 </div>
               </div>
             </CardContent>
@@ -87,10 +96,11 @@ export default function PractitionerDashboardFlow() {
           <Card className="bg-white/70 backdrop-blur-sm border-white/20">
             <CardContent className="p-4">
               <div className="flex items-center gap-2">
-                <TrendingUp className="h-5 w-5 text-blue-600" />
+                <Leaf className="h-5 w-5 text-blue-600" />
                 <div>
-                  <p className="text-xs text-gray-600">Soil Health</p>
-                  <p className="text-lg font-bold">+{impactMetrics.soilHealthImprovement}%</p>
+                  <p className="text-xs text-gray-600">CO₂ Sequestered</p>
+                  <p className="text-lg font-bold">{keyMetrics.co2Sequestered} Tons</p>
+                  <p className="text-xs text-blue-600">+45 tons this month</p>
                 </div>
               </div>
             </CardContent>
@@ -99,10 +109,11 @@ export default function PractitionerDashboardFlow() {
           <Card className="bg-white/70 backdrop-blur-sm border-white/20">
             <CardContent className="p-4">
               <div className="flex items-center gap-2">
-                <Award className="h-5 w-5 text-purple-600" />
+                <DollarSign className="h-5 w-5 text-purple-600" />
                 <div>
-                  <p className="text-xs text-gray-600">Biodiversity</p>
-                  <p className="text-lg font-bold">+{impactMetrics.biodiversityIncrease}%</p>
+                  <p className="text-xs text-gray-600">Annual Revenue</p>
+                  <p className="text-lg font-bold">${(keyMetrics.annualRevenue / 1000).toFixed(0)}K</p>
+                  <p className="text-xs text-purple-600">+18% this year</p>
                 </div>
               </div>
             </CardContent>
@@ -111,34 +122,11 @@ export default function PractitionerDashboardFlow() {
           <Card className="bg-white/70 backdrop-blur-sm border-white/20">
             <CardContent className="p-4">
               <div className="flex items-center gap-2">
-                <Users className="h-5 w-5 text-orange-600" />
+                <Bug className="h-5 w-5 text-orange-600" />
                 <div>
-                  <p className="text-xs text-gray-600">Community</p>
-                  <p className="text-lg font-bold">{impactMetrics.communityMembers}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-white/70 backdrop-blur-sm border-white/20">
-            <CardContent className="p-4">
-              <div className="flex items-center gap-2">
-                <DollarSign className="h-5 w-5 text-green-600" />
-                <div>
-                  <p className="text-xs text-gray-600">Funding</p>
-                  <p className="text-lg font-bold">${(impactMetrics.fundingReceived / 1000).toFixed(0)}k</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-white/70 backdrop-blur-sm border-white/20">
-            <CardContent className="p-4">
-              <div className="flex items-center gap-2">
-                <Target className="h-5 w-5 text-red-600" />
-                <div>
-                  <p className="text-xs text-gray-600">Active Projects</p>
-                  <p className="text-lg font-bold">{impactMetrics.projectsActive}</p>
+                  <p className="text-xs text-gray-600">Biodiversity Index</p>
+                  <p className="text-lg font-bold">{keyMetrics.biodiversityIndex}</p>
+                  <p className="text-xs text-orange-600">+0.4 this season</p>
                 </div>
               </div>
             </CardContent>
@@ -146,171 +134,107 @@ export default function PractitionerDashboardFlow() {
         </div>
 
         {/* Main Content */}
-        <Tabs defaultValue="projects" className="space-y-4">
+        <Tabs defaultValue="land-health" className="space-y-4">
           <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4">
-            <TabsTrigger value="projects">My Projects</TabsTrigger>
-            <TabsTrigger value="funding">Funding</TabsTrigger>
-            <TabsTrigger value="impact">Impact Tracking</TabsTrigger>
-            <TabsTrigger value="community">Community</TabsTrigger>
+            <TabsTrigger value="land-health">Land Health</TabsTrigger>
+            <TabsTrigger value="carbon-credits">Carbon Credits</TabsTrigger>
+            <TabsTrigger value="revenue">Revenue Analytics</TabsTrigger>
+            <TabsTrigger value="biodiversity">Biodiversity</TabsTrigger>
           </TabsList>
 
-          {/* Projects Tab */}
-          <TabsContent value="projects" className="space-y-4">
-            <div className="flex justify-between items-center">
-              <h2 className="text-xl font-semibold">Your Projects</h2>
-              <Button size="sm">
-                <Plus className="h-4 w-4 mr-2" />
-                Add Project
-              </Button>
-            </div>
-            
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {projects.map((project) => (
-                <Card key={project.id} className="bg-white/70 backdrop-blur-sm border-white/20">
-                  <CardHeader>
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <CardTitle className="text-lg">{project.name}</CardTitle>
-                        <Badge variant={project.status === 'active' ? 'default' : 'secondary'}>
-                          {project.status}
-                        </Badge>
-                      </div>
-                      <div className="flex gap-2">
-                        <Button size="sm" variant="outline">
-                          <Eye className="h-4 w-4" />
-                        </Button>
-                        <Button size="sm" variant="outline">
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div>
-                      <div className="flex justify-between text-sm mb-1">
-                        <span>Project Progress</span>
-                        <span>{project.progress}%</span>
-                      </div>
-                      <Progress value={project.progress} />
-                    </div>
-
-                    <div>
-                      <div className="flex justify-between text-sm mb-1">
-                        <span>Funding Progress</span>
-                        <span>${project.funding.raised.toLocaleString()} / ${project.funding.goal.toLocaleString()}</span>
-                      </div>
-                      <Progress value={(project.funding.raised / project.funding.goal) * 100} />
-                    </div>
-
-                    <div className="grid grid-cols-3 gap-4 text-sm">
-                      <div className="text-center">
-                        <p className="text-gray-600">Soil Health</p>
-                        <p className="font-semibold">{project.metrics.soilHealth}%</p>
-                      </div>
-                      <div className="text-center">
-                        <p className="text-gray-600">Carbon</p>
-                        <p className="font-semibold">{project.metrics.carbonSequestered} tCO₂</p>
-                      </div>
-                      <div className="text-center">
-                        <p className="text-gray-600">Biodiversity</p>
-                        <p className="font-semibold">{project.metrics.biodiversity}%</p>
-                      </div>
-                    </div>
-
-                    <div className="bg-blue-50 rounded-lg p-3">
-                      <div className="flex items-center gap-2">
-                        <Calendar className="h-4 w-4 text-blue-600" />
-                        <div>
-                          <p className="text-sm font-medium">Next Milestone</p>
-                          <p className="text-xs text-gray-600">{project.nextMilestone} in {project.daysToMilestone} days</p>
-                        </div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </TabsContent>
-
-          {/* Funding Tab */}
-          <TabsContent value="funding" className="space-y-4">
+          {/* Land Health Tracking Tab */}
+          <TabsContent value="land-health" className="space-y-4">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <Card className="bg-white/70 backdrop-blur-sm border-white/20">
                 <CardHeader>
-                  <CardTitle>Funding Overview</CardTitle>
+                  <CardTitle className="flex items-center gap-2">
+                    <Activity className="h-5 w-5 text-green-600" />
+                    Soil Health Monitoring
+                  </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <p className="text-sm text-gray-600">Total Raised</p>
-                      <p className="text-2xl font-bold text-green-600">${impactMetrics.fundingReceived.toLocaleString()}</p>
+                    <div className="text-center p-3 bg-green-50 rounded-lg">
+                      <div className="text-2xl font-bold text-green-700">6.8</div>
+                      <div className="text-xs text-gray-600">pH Level</div>
                     </div>
-                    <div>
-                      <p className="text-sm text-gray-600">Active Investors</p>
-                      <p className="text-2xl font-bold">12</p>
+                    <div className="text-center p-3 bg-blue-50 rounded-lg">
+                      <div className="text-2xl font-bold text-blue-700">4.2%</div>
+                      <div className="text-xs text-gray-600">Organic Matter</div>
+                    </div>
+                    <div className="text-center p-3 bg-purple-50 rounded-lg">
+                      <div className="text-2xl font-bold text-purple-700">85</div>
+                      <div className="text-xs text-gray-600">Nutrient Index</div>
+                    </div>
+                    <div className="text-center p-3 bg-orange-50 rounded-lg">
+                      <div className="text-2xl font-bold text-orange-700">92%</div>
+                      <div className="text-xs text-gray-600">Microbial Activity</div>
                     </div>
                   </div>
-                  <Button className="w-full">Apply for Additional Funding</Button>
+                  <Button className="w-full">View Detailed Soil Report</Button>
                 </CardContent>
               </Card>
 
               <Card className="bg-white/70 backdrop-blur-sm border-white/20">
                 <CardHeader>
-                  <CardTitle>Recent Funding Activity</CardTitle>
+                  <CardTitle className="flex items-center gap-2">
+                    <Droplets className="h-5 w-5 text-blue-600" />
+                    Water Quality Tracking
+                  </CardTitle>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="space-y-4">
                   <div className="space-y-3">
-                    <div className="flex justify-between items-center p-3 bg-green-50 rounded-lg">
-                      <div>
-                        <p className="font-medium">Investment Received</p>
-                        <p className="text-sm text-gray-600">Green Impact Fund</p>
-                      </div>
-                      <p className="font-bold text-green-600">+$15,000</p>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm">Nitrate Levels</span>
+                      <Badge variant="secondary" className="bg-green-100 text-green-800">Optimal</Badge>
                     </div>
-                    <div className="flex justify-between items-center p-3 bg-blue-50 rounded-lg">
-                      <div>
-                        <p className="font-medium">Grant Approved</p>
-                        <p className="text-sm text-gray-600">Regenerative Agriculture Initiative</p>
-                      </div>
-                      <p className="font-bold text-blue-600">+$25,000</p>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm">Phosphorus</span>
+                      <Badge variant="secondary" className="bg-yellow-100 text-yellow-800">Moderate</Badge>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm">Dissolved Oxygen</span>
+                      <Badge variant="secondary" className="bg-green-100 text-green-800">Excellent</Badge>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm">Turbidity</span>
+                      <Badge variant="secondary" className="bg-green-100 text-green-800">Clear</Badge>
                     </div>
                   </div>
+                  <Button variant="outline" className="w-full">Schedule Water Testing</Button>
                 </CardContent>
               </Card>
             </div>
           </TabsContent>
 
-          {/* Impact Tracking Tab */}
-          <TabsContent value="impact" className="space-y-4">
+          {/* Carbon Credit Management Tab */}
+          <TabsContent value="carbon-credits" className="space-y-4">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               <Card className="bg-white/70 backdrop-blur-sm border-white/20">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <Sprout className="h-5 w-5 text-green-600" />
-                    Environmental Impact
+                    <Leaf className="h-5 w-5 text-green-600" />
+                    Carbon Portfolio
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div>
-                    <div className="flex justify-between text-sm mb-1">
-                      <span>Carbon Sequestration</span>
-                      <span>14.6 tCO₂</span>
-                    </div>
-                    <Progress value={73} />
+                  <div className="text-center">
+                    <div className="text-3xl font-bold text-green-700">{keyMetrics.co2Sequestered}</div>
+                    <div className="text-sm text-gray-600">Total Tons Sequestered</div>
                   </div>
-                  <div>
-                    <div className="flex justify-between text-sm mb-1">
-                      <span>Soil Health</span>
-                      <span>+23%</span>
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span>Available Credits</span>
+                      <span className="font-medium">285 tons</span>
                     </div>
-                    <Progress value={78} />
-                  </div>
-                  <div>
-                    <div className="flex justify-between text-sm mb-1">
-                      <span>Water Conservation</span>
-                      <span>2,400L saved</span>
+                    <div className="flex justify-between text-sm">
+                      <span>Sold Credits</span>
+                      <span className="font-medium">165 tons</span>
                     </div>
-                    <Progress value={65} />
+                    <div className="flex justify-between text-sm">
+                      <span>Current Price</span>
+                      <span className="font-medium text-green-600">$45/ton</span>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
@@ -318,92 +242,88 @@ export default function PractitionerDashboardFlow() {
               <Card className="bg-white/70 backdrop-blur-sm border-white/20">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <Users className="h-5 w-5 text-blue-600" />
-                    Social Impact
+                    <TrendingUp className="h-5 w-5 text-blue-600" />
+                    Market Performance
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div>
-                    <div className="flex justify-between text-sm mb-1">
-                      <span>Jobs Created</span>
-                      <span>8 positions</span>
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm">This Month</span>
+                      <span className="text-green-600 font-medium">+12%</span>
                     </div>
-                    <Progress value={80} />
-                  </div>
-                  <div>
-                    <div className="flex justify-between text-sm mb-1">
-                      <span>Community Engagement</span>
-                      <span>156 members</span>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm">Market Trend</span>
+                      <Badge className="bg-green-100 text-green-800">Bullish</Badge>
                     </div>
-                    <Progress value={85} />
-                  </div>
-                  <div>
-                    <div className="flex justify-between text-sm mb-1">
-                      <span>Knowledge Sharing</span>
-                      <span>24 sessions</span>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm">Demand Score</span>
+                      <span className="font-medium">8.5/10</span>
                     </div>
-                    <Progress value={70} />
                   </div>
+                  <Button className="w-full">Sell Credits</Button>
                 </CardContent>
               </Card>
 
               <Card className="bg-white/70 backdrop-blur-sm border-white/20">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <DollarSign className="h-5 w-5 text-green-600" />
-                    Economic Impact
+                    <Award className="h-5 w-5 text-purple-600" />
+                    Verification Status
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div>
-                    <div className="flex justify-between text-sm mb-1">
-                      <span>Revenue Generated</span>
-                      <span>$42,000</span>
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm">Verra Standard</span>
+                      <Badge className="bg-green-100 text-green-800">Verified</Badge>
                     </div>
-                    <Progress value={68} />
-                  </div>
-                  <div>
-                    <div className="flex justify-between text-sm mb-1">
-                      <span>Cost Savings</span>
-                      <span>$8,500</span>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm">Gold Standard</span>
+                      <Badge className="bg-yellow-100 text-yellow-800">Pending</Badge>
                     </div>
-                    <Progress value={55} />
-                  </div>
-                  <div>
-                    <div className="flex justify-between text-sm mb-1">
-                      <span>ROI</span>
-                      <span>12.5%</span>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm">Next Audit</span>
+                      <span className="text-sm text-gray-600">Mar 2024</span>
                     </div>
-                    <Progress value={75} />
                   </div>
+                  <Button variant="outline" className="w-full">Request Verification</Button>
                 </CardContent>
               </Card>
             </div>
           </TabsContent>
 
-          {/* Community Tab */}
-          <TabsContent value="community" className="space-y-4">
+          {/* Revenue Stream Analytics Tab */}
+          <TabsContent value="revenue" className="space-y-4">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <Card className="bg-white/70 backdrop-blur-sm border-white/20">
                 <CardHeader>
-                  <CardTitle>Knowledge Sharing</CardTitle>
+                  <CardTitle className="flex items-center gap-2">
+                    <BarChart3 className="h-5 w-5 text-green-600" />
+                    Revenue Breakdown
+                  </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="space-y-3">
-                    <div className="p-3 border rounded-lg">
-                      <h4 className="font-medium">Soil Testing Workshop</h4>
-                      <p className="text-sm text-gray-600">Share your soil testing methodology</p>
-                      <div className="flex justify-between items-center mt-2">
-                        <Badge variant="outline">Agriculture</Badge>
-                        <Button size="sm">Join Discussion</Button>
+                    <div className="flex justify-between items-center p-3 bg-green-50 rounded-lg">
+                      <span className="font-medium">Carbon Credits</span>
+                      <div className="text-right">
+                        <div className="font-bold text-green-700">$48,000</div>
+                        <div className="text-xs text-gray-600">36% of total</div>
                       </div>
                     </div>
-                    <div className="p-3 border rounded-lg">
-                      <h4 className="font-medium">Carbon Credit Marketplace</h4>
-                      <p className="text-sm text-gray-600">Learn about carbon credit opportunities</p>
-                      <div className="flex justify-between items-center mt-2">
-                        <Badge variant="outline">Carbon</Badge>
-                        <Button size="sm">Learn More</Button>
+                    <div className="flex justify-between items-center p-3 bg-blue-50 rounded-lg">
+                      <span className="font-medium">Regenerative Products</span>
+                      <div className="text-right">
+                        <div className="font-bold text-blue-700">$52,000</div>
+                        <div className="text-xs text-gray-600">39% of total</div>
+                      </div>
+                    </div>
+                    <div className="flex justify-between items-center p-3 bg-purple-50 rounded-lg">
+                      <span className="font-medium">Impact Bonds</span>
+                      <div className="text-right">
+                        <div className="font-bold text-purple-700">$32,000</div>
+                        <div className="text-xs text-gray-600">25% of total</div>
                       </div>
                     </div>
                   </div>
@@ -412,20 +332,104 @@ export default function PractitionerDashboardFlow() {
 
               <Card className="bg-white/70 backdrop-blur-sm border-white/20">
                 <CardHeader>
-                  <CardTitle>Recent Notifications</CardTitle>
+                  <CardTitle className="flex items-center gap-2">
+                    <TrendingUp className="h-5 w-5 text-blue-600" />
+                    Profitability Analysis
+                  </CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    {notifications.map((notification) => (
-                      <div key={notification.id} className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
-                        <Bell className="h-4 w-4 text-blue-600 mt-1" />
-                        <div className="flex-1">
-                          <p className="text-sm font-medium">{notification.message}</p>
-                          <p className="text-xs text-gray-500">{notification.time}</p>
-                        </div>
-                      </div>
-                    ))}
+                <CardContent className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="text-center p-3 bg-green-50 rounded-lg">
+                      <div className="text-xl font-bold text-green-700">285%</div>
+                      <div className="text-xs text-gray-600">ROI</div>
+                    </div>
+                    <div className="text-center p-3 bg-blue-50 rounded-lg">
+                      <div className="text-xl font-bold text-blue-700">$106</div>
+                      <div className="text-xs text-gray-600">Revenue/Hectare</div>
+                    </div>
+                    <div className="text-center p-3 bg-purple-50 rounded-lg">
+                      <div className="text-xl font-bold text-purple-700">68%</div>
+                      <div className="text-xs text-gray-600">Profit Margin</div>
+                    </div>
+                    <div className="text-center p-3 bg-orange-50 rounded-lg">
+                      <div className="text-xl font-bold text-orange-700">+18%</div>
+                      <div className="text-xs text-gray-600">YoY Growth</div>
+                    </div>
                   </div>
+                  <Button className="w-full">Download Financial Report</Button>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+
+          {/* Biodiversity Monitoring Tab */}
+          <TabsContent value="biodiversity" className="space-y-4">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <Card className="bg-white/70 backdrop-blur-sm border-white/20">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Bug className="h-5 w-5 text-green-600" />
+                    Species Monitoring
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="text-center mb-4">
+                    <div className="text-3xl font-bold text-green-700">{keyMetrics.biodiversityIndex}</div>
+                    <div className="text-sm text-gray-600">Biodiversity Index Score</div>
+                  </div>
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm">Native Species</span>
+                      <span className="font-medium text-green-600">127 species</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm">Pollinator Population</span>
+                      <span className="font-medium text-blue-600">+23% increase</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm">Bird Species</span>
+                      <span className="font-medium text-purple-600">45 species</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm">Invasive Species</span>
+                      <span className="font-medium text-orange-600">-15% reduction</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-white/70 backdrop-blur-sm border-white/20">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Leaf className="h-5 w-5 text-blue-600" />
+                    Habitat Quality
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-3">
+                    <div className="space-y-2">
+                      <div className="flex justify-between text-sm">
+                        <span>Forest Canopy Cover</span>
+                        <span>78%</span>
+                      </div>
+                      <Progress value={78} />
+                    </div>
+                    <div className="space-y-2">
+                      <div className="flex justify-between text-sm">
+                        <span>Wetland Health</span>
+                        <span>85%</span>
+                      </div>
+                      <Progress value={85} />
+                    </div>
+                    <div className="space-y-2">
+                      <div className="flex justify-between text-sm">
+                        <span>Wildlife Corridors</span>
+                        <span>92%</span>
+                      </div>
+                      <Progress value={92} />
+                    </div>
+                  </div>
+                  <Button variant="outline" className="w-full">Schedule Habitat Survey</Button>
                 </CardContent>
               </Card>
             </div>

@@ -7,10 +7,17 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import UserFlowLayout from '@/components/UserFlowLayout';
 import { 
   TrendingUp, DollarSign, Target, BarChart3, Award, 
-  Eye, Plus, ArrowUpRight, ArrowDownRight, Activity 
+  Eye, Plus, ArrowUpRight, ArrowDownRight, Activity,
+  AlertTriangle, CheckCircle, FileText, Users, Calendar
 } from 'lucide-react';
 
 export default function InvestorDashboardFlow() {
+  // Key Metrics Data for Investors & Institutions
+  const keyMetrics = {
+    assetsUnderManagement: 25000000, // $25M
+    portfolioReturns: 28.5, // 28.5%
+    impactScore: 9.2 // 9.2/10
+  };
   const [portfolio] = useState([
     {
       id: '1',
@@ -87,8 +94,8 @@ export default function InvestorDashboardFlow() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Investment Portfolio</h1>
-            <p className="text-gray-600">Track your regenerative impact investments</p>
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Investor & Institution Dashboard</h1>
+            <p className="text-gray-600">Forward-thinking capital seeking credible, large-scale impact opportunities</p>
           </div>
           <Button size="sm">
             <Plus className="h-4 w-4 mr-2" />
@@ -96,15 +103,16 @@ export default function InvestorDashboardFlow() {
           </Button>
         </div>
 
-        {/* Portfolio Overview */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+        {/* Key Metrics */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <Card className="bg-white/70 backdrop-blur-sm border-white/20">
             <CardContent className="p-4">
               <div className="flex items-center gap-2">
                 <DollarSign className="h-5 w-5 text-green-600" />
                 <div>
-                  <p className="text-xs text-gray-600">Total Invested</p>
-                  <p className="text-lg font-bold">${(totalInvested / 1000).toFixed(0)}k</p>
+                  <p className="text-xs text-gray-600">Assets Under Management</p>
+                  <p className="text-lg font-bold">${(keyMetrics.assetsUnderManagement / 1000000).toFixed(0)}M</p>
+                  <p className="text-xs text-green-600">+$3.2M this quarter</p>
                 </div>
               </div>
             </CardContent>
@@ -113,10 +121,11 @@ export default function InvestorDashboardFlow() {
           <Card className="bg-white/70 backdrop-blur-sm border-white/20">
             <CardContent className="p-4">
               <div className="flex items-center gap-2">
-                <BarChart3 className="h-5 w-5 text-blue-600" />
+                <TrendingUp className="h-5 w-5 text-blue-600" />
                 <div>
-                  <p className="text-xs text-gray-600">Current Value</p>
-                  <p className="text-lg font-bold">${(totalCurrentValue / 1000).toFixed(0)}k</p>
+                  <p className="text-xs text-gray-600">Portfolio Returns</p>
+                  <p className="text-lg font-bold">{keyMetrics.portfolioReturns}%</p>
+                  <p className="text-xs text-blue-600">+4.2% vs benchmark</p>
                 </div>
               </div>
             </CardContent>
@@ -125,34 +134,11 @@ export default function InvestorDashboardFlow() {
           <Card className="bg-white/70 backdrop-blur-sm border-white/20">
             <CardContent className="p-4">
               <div className="flex items-center gap-2">
-                <TrendingUp className="h-5 w-5 text-green-600" />
+                <Award className="h-5 w-5 text-purple-600" />
                 <div>
-                  <p className="text-xs text-gray-600">Total Return</p>
-                  <p className="text-lg font-bold text-green-600">+{totalReturn.toFixed(1)}%</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-white/70 backdrop-blur-sm border-white/20">
-            <CardContent className="p-4">
-              <div className="flex items-center gap-2">
-                <Target className="h-5 w-5 text-purple-600" />
-                <div>
-                  <p className="text-xs text-gray-600">Carbon Offset</p>
-                  <p className="text-lg font-bold">{totalCarbonOffset.toFixed(0)} tCO₂</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-white/70 backdrop-blur-sm border-white/20">
-            <CardContent className="p-4">
-              <div className="flex items-center gap-2">
-                <Award className="h-5 w-5 text-orange-600" />
-                <div>
-                  <p className="text-xs text-gray-600">Jobs Created</p>
-                  <p className="text-lg font-bold">{totalJobsCreated}</p>
+                  <p className="text-xs text-gray-600">Impact Score</p>
+                  <p className="text-lg font-bold">{keyMetrics.impactScore}/10</p>
+                  <p className="text-xs text-purple-600">Top 5% globally</p>
                 </div>
               </div>
             </CardContent>
@@ -162,193 +148,197 @@ export default function InvestorDashboardFlow() {
         {/* Main Content */}
         <Tabs defaultValue="portfolio" className="space-y-4">
           <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4">
-            <TabsTrigger value="portfolio">Portfolio</TabsTrigger>
-            <TabsTrigger value="opportunities">Opportunities</TabsTrigger>
-            <TabsTrigger value="impact">Impact Report</TabsTrigger>
-            <TabsTrigger value="analytics">Analytics</TabsTrigger>
+            <TabsTrigger value="portfolio">Portfolio Performance</TabsTrigger>
+            <TabsTrigger value="risk">Risk Analysis</TabsTrigger>
+            <TabsTrigger value="impact">Impact Metrics</TabsTrigger>
+            <TabsTrigger value="deals">Deal Flow</TabsTrigger>
           </TabsList>
 
-          {/* Portfolio Tab */}
+          {/* Portfolio Performance Tab */}
           <TabsContent value="portfolio" className="space-y-4">
-            <div className="flex justify-between items-center">
-              <h2 className="text-xl font-semibold">Your Investments</h2>
-              <div className="flex gap-2">
-                <Button variant="outline" size="sm">Export Report</Button>
-                <Button size="sm">
-                  <Plus className="h-4 w-4 mr-2" />
-                  Add Investment
-                </Button>
-              </div>
-            </div>
-            
-            <div className="space-y-4">
-              {portfolio.map((investment) => (
-                <Card key={investment.id} className="bg-white/70 backdrop-blur-sm border-white/20">
-                  <CardContent className="p-6">
-                    <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-3 mb-2">
-                          <h3 className="text-lg font-semibold">{investment.name}</h3>
-                          <Badge variant="outline">{investment.type}</Badge>
-                          <Badge 
-                            className={
-                              investment.status === 'outperforming' ? 'bg-green-100 text-green-800' :
-                              investment.status === 'performing' ? 'bg-blue-100 text-blue-800' :
-                              'bg-yellow-100 text-yellow-800'
-                            }
-                          >
-                            {investment.status}
-                          </Badge>
-                        </div>
-                        
-                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">
-                          <div>
-                            <p className="text-gray-600">Invested</p>
-                            <p className="font-semibold">${investment.invested.toLocaleString()}</p>
-                          </div>
-                          <div>
-                            <p className="text-gray-600">Current Value</p>
-                            <p className="font-semibold">${investment.currentValue.toLocaleString()}</p>
-                          </div>
-                          <div>
-                            <p className="text-gray-600">Return</p>
-                            <p className={`font-semibold flex items-center gap-1 ${
-                              investment.return >= 0 ? 'text-green-600' : 'text-red-600'
-                            }`}>
-                              {investment.return >= 0 ? <ArrowUpRight className="h-3 w-3" /> : <ArrowDownRight className="h-3 w-3" />}
-                              {investment.return >= 0 ? '+' : ''}{investment.return.toFixed(1)}%
-                            </p>
-                          </div>
-                          <div>
-                            <p className="text-gray-600">Impact Score</p>
-                            <p className="font-semibold text-blue-600">{investment.impactScore}/100</p>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="flex flex-col sm:flex-row gap-3">
-                        <div className="text-center">
-                          <p className="text-xs text-gray-600">Carbon Offset</p>
-                          <p className="font-semibold text-green-600">{investment.carbonOffset} tCO₂</p>
-                        </div>
-                        <div className="text-center">
-                          <p className="text-xs text-gray-600">Jobs Created</p>
-                          <p className="font-semibold text-blue-600">{investment.jobsCreated}</p>
-                        </div>
-                        <Button size="sm" variant="outline">
-                          <Eye className="h-4 w-4 mr-2" />
-                          View Details
-                        </Button>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </TabsContent>
-
-          {/* Opportunities Tab */}
-          <TabsContent value="opportunities" className="space-y-4">
-            <div className="flex justify-between items-center">
-              <h2 className="text-xl font-semibold">Investment Opportunities</h2>
-              <Button variant="outline" size="sm">Filter & Sort</Button>
-            </div>
-            
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {opportunities.map((opportunity) => (
-                <Card key={opportunity.id} className="bg-white/70 backdrop-blur-sm border-white/20">
-                  <CardHeader>
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <CardTitle className="text-lg">{opportunity.name}</CardTitle>
-                        <Badge variant="outline">{opportunity.type}</Badge>
-                      </div>
-                      <Badge className="bg-green-100 text-green-800">Verified</Badge>
+              <Card className="bg-white/70 backdrop-blur-sm border-white/20">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <BarChart3 className="h-5 w-5 text-green-600" />
+                    Asset Allocation
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm font-medium">Regenerative Agriculture</span>
+                      <span className="text-sm text-green-600">35% ($8.75M)</span>
                     </div>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="grid grid-cols-2 gap-4 text-sm">
-                      <div>
-                        <p className="text-gray-600">Expected Return</p>
-                        <p className="font-semibold text-green-600">{opportunity.expectedReturn}%</p>
-                      </div>
-                      <div>
-                        <p className="text-gray-600">Impact Score</p>
-                        <p className="font-semibold text-blue-600">{opportunity.impactScore}/100</p>
-                      </div>
-                      <div>
-                        <p className="text-gray-600">Min Investment</p>
-                        <p className="font-semibold">${opportunity.minInvestment.toLocaleString()}</p>
-                      </div>
-                      <div>
-                        <p className="text-gray-600">Timeline</p>
-                        <p className="font-semibold">{opportunity.timeline}</p>
-                      </div>
+                    <Progress value={35} className="h-2" />
+                    
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm font-medium">Clean Energy</span>
+                      <span className="text-sm text-blue-600">28% ($7.0M)</span>
                     </div>
+                    <Progress value={28} className="h-2" />
+                    
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm font-medium">Ocean Restoration</span>
+                      <span className="text-sm text-purple-600">20% ($5.0M)</span>
+                    </div>
+                    <Progress value={20} className="h-2" />
+                    
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm font-medium">Circular Economy</span>
+                      <span className="text-sm text-orange-600">17% ($4.25M)</span>
+                    </div>
+                    <Progress value={17} className="h-2" />
+                  </div>
+                </CardContent>
+              </Card>
 
-                    <div>
-                      <div className="flex justify-between text-sm mb-1">
-                        <span>Funding Progress</span>
-                        <span>{((opportunity.fundingRaised / opportunity.fundingGoal) * 100).toFixed(0)}%</span>
-                      </div>
-                      <Progress value={(opportunity.fundingRaised / opportunity.fundingGoal) * 100} />
-                      <p className="text-xs text-gray-500 mt-1">
-                        ${opportunity.fundingRaised.toLocaleString()} of ${opportunity.fundingGoal.toLocaleString()}
-                      </p>
+              <Card className="bg-white/70 backdrop-blur-sm border-white/20">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <TrendingUp className="h-5 w-5 text-blue-600" />
+                    Performance Analytics
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="text-center p-3 bg-green-50 rounded-lg">
+                      <div className="text-xl font-bold text-green-700">{keyMetrics.portfolioReturns}%</div>
+                      <div className="text-xs text-gray-600">Total Return</div>
                     </div>
-
-                    <div className="flex gap-2">
-                      <Button variant="outline" size="sm" className="flex-1">
-                        <Eye className="h-4 w-4 mr-2" />
-                        View Details
-                      </Button>
-                      <Button size="sm" className="flex-1">
-                        Invest Now
-                      </Button>
+                    <div className="text-center p-3 bg-blue-50 rounded-lg">
+                      <div className="text-xl font-bold text-blue-700">1.85</div>
+                      <div className="text-xs text-gray-600">Sharpe Ratio</div>
                     </div>
-                  </CardContent>
-                </Card>
-              ))}
+                    <div className="text-center p-3 bg-purple-50 rounded-lg">
+                      <div className="text-xl font-bold text-purple-700">-8.2%</div>
+                      <div className="text-xs text-gray-600">Max Drawdown</div>
+                    </div>
+                    <div className="text-center p-3 bg-orange-50 rounded-lg">
+                      <div className="text-xl font-bold text-orange-700">4.2%</div>
+                      <div className="text-xs text-gray-600">Alpha</div>
+                    </div>
+                  </div>
+                  <Button className="w-full">View Detailed Analytics</Button>
+                </CardContent>
+              </Card>
             </div>
           </TabsContent>
 
-          {/* Impact Report Tab */}
+          {/* Risk Analysis Tab */}
+          <TabsContent value="risk" className="space-y-4">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <Card className="bg-white/70 backdrop-blur-sm border-white/20">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <AlertTriangle className="h-5 w-5 text-orange-600" />
+                    Risk Assessment
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm">Portfolio VaR (95%)</span>
+                      <Badge variant="secondary" className="bg-green-100 text-green-800">Low Risk</Badge>
+                    </div>
+                    <div className="text-center p-3 bg-red-50 rounded-lg">
+                      <div className="text-xl font-bold text-red-700">$1.2M</div>
+                      <div className="text-xs text-gray-600">Maximum 1-day loss</div>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <div className="flex justify-between text-sm">
+                        <span>Climate Risk</span>
+                        <span className="text-green-600">Low (2.1/10)</span>
+                      </div>
+                      <Progress value={21} className="h-2" />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <div className="flex justify-between text-sm">
+                        <span>Liquidity Risk</span>
+                        <span className="text-yellow-600">Medium (4.5/10)</span>
+                      </div>
+                      <Progress value={45} className="h-2" />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <div className="flex justify-between text-sm">
+                        <span>Concentration Risk</span>
+                        <span className="text-green-600">Low (3.2/10)</span>
+                      </div>
+                      <Progress value={32} className="h-2" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-white/70 backdrop-blur-sm border-white/20">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Activity className="h-5 w-5 text-blue-600" />
+                    Stress Testing
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-3">
+                    <div className="p-3 border rounded-lg">
+                      <div className="flex justify-between items-center mb-2">
+                        <span className="font-medium text-sm">Market Crash Scenario</span>
+                        <span className="text-red-600 font-bold">-15.2%</span>
+                      </div>
+                      <p className="text-xs text-gray-600">30% market decline impact</p>
+                    </div>
+                    
+                    <div className="p-3 border rounded-lg">
+                      <div className="flex justify-between items-center mb-2">
+                        <span className="font-medium text-sm">Climate Event Scenario</span>
+                        <span className="text-orange-600 font-bold">-8.7%</span>
+                      </div>
+                      <p className="text-xs text-gray-600">Extreme weather impact</p>
+                    </div>
+                    
+                    <div className="p-3 border rounded-lg">
+                      <div className="flex justify-between items-center mb-2">
+                        <span className="font-medium text-sm">Regulatory Change</span>
+                        <span className="text-yellow-600 font-bold">-5.3%</span>
+                      </div>
+                      <p className="text-xs text-gray-600">Policy shift impact</p>
+                    </div>
+                  </div>
+                  <Button variant="outline" className="w-full">Run Custom Scenario</Button>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+
+          {/* Impact Metrics Tab */}
           <TabsContent value="impact" className="space-y-4">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               <Card className="bg-white/70 backdrop-blur-sm border-white/20">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <Target className="h-5 w-5 text-green-600" />
-                    Environmental Impact
+                    <Award className="h-5 w-5 text-green-600" />
+                    Impact Performance
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="text-center p-4 bg-green-50 rounded-lg">
-                    <p className="text-2xl font-bold text-green-600">{totalCarbonOffset.toFixed(0)} tCO₂</p>
-                    <p className="text-sm text-gray-600">Total Carbon Offset</p>
+                  <div className="text-center mb-4">
+                    <div className="text-3xl font-bold text-green-700">{keyMetrics.impactScore}</div>
+                    <div className="text-sm text-gray-600">Overall Impact Score</div>
                   </div>
-                  
                   <div className="space-y-3">
-                    <div>
-                      <div className="flex justify-between text-sm mb-1">
-                        <span>Soil Health Improvement</span>
-                        <span>+28%</span>
-                      </div>
-                      <Progress value={85} />
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm">Environmental Impact</span>
+                      <span className="font-medium text-green-600">9.5/10</span>
                     </div>
-                    <div>
-                      <div className="flex justify-between text-sm mb-1">
-                        <span>Biodiversity Conservation</span>
-                        <span>+35%</span>
-                      </div>
-                      <Progress value={92} />
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm">Social Impact</span>
+                      <span className="font-medium text-blue-600">8.8/10</span>
                     </div>
-                    <div>
-                      <div className="flex justify-between text-sm mb-1">
-                        <span>Water Conservation</span>
-                        <span>12,500L saved</span>
-                      </div>
-                      <Progress value={78} />
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm">Governance Score</span>
+                      <span className="font-medium text-purple-600">9.3/10</span>
                     </div>
                   </div>
                 </CardContent>
@@ -357,97 +347,113 @@ export default function InvestorDashboardFlow() {
               <Card className="bg-white/70 backdrop-blur-sm border-white/20">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <Award className="h-5 w-5 text-blue-600" />
-                    Social Impact
+                    <Target className="h-5 w-5 text-blue-600" />
+                    SDG Alignment
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="text-center p-4 bg-blue-50 rounded-lg">
-                    <p className="text-2xl font-bold text-blue-600">{totalJobsCreated}</p>
-                    <p className="text-sm text-gray-600">Jobs Created</p>
-                  </div>
-                  
                   <div className="space-y-3">
-                    <div>
-                      <div className="flex justify-between text-sm mb-1">
-                        <span>Community Members Impacted</span>
-                        <span>2,450</span>
-                      </div>
-                      <Progress value={88} />
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm">Climate Action (SDG 13)</span>
+                      <span className="font-medium">85%</span>
                     </div>
-                    <div>
-                      <div className="flex justify-between text-sm mb-1">
-                        <span>Training Programs</span>
-                        <span>18 completed</span>
-                      </div>
-                      <Progress value={75} />
+                    <Progress value={85} className="h-2" />
+                    
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm">Life Below Water (SDG 14)</span>
+                      <span className="font-medium">72%</span>
                     </div>
-                    <div>
-                      <div className="flex justify-between text-sm mb-1">
-                        <span>Local Economic Growth</span>
-                        <span>+15%</span>
-                      </div>
-                      <Progress value={82} />
+                    <Progress value={72} className="h-2" />
+                    
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm">Life on Land (SDG 15)</span>
+                      <span className="font-medium">78%</span>
+                    </div>
+                    <Progress value={78} className="h-2" />
+                    
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm">Decent Work (SDG 8)</span>
+                      <span className="font-medium">65%</span>
+                    </div>
+                    <Progress value={65} className="h-2" />
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-white/70 backdrop-blur-sm border-white/20">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <CheckCircle className="h-5 w-5 text-purple-600" />
+                    Impact Verification
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm">Third-Party Verified</span>
+                      <Badge className="bg-green-100 text-green-800">98.5%</Badge>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm">Real-time Monitoring</span>
+                      <Badge className="bg-blue-100 text-blue-800">Active</Badge>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm">Audit Compliance</span>
+                      <Badge className="bg-purple-100 text-purple-800">100%</Badge>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm">Impact ROI</span>
+                      <span className="font-medium text-green-600">3.2x</span>
                     </div>
                   </div>
+                  <Button variant="outline" className="w-full">View Impact Report</Button>
                 </CardContent>
               </Card>
             </div>
-
-            <Card className="bg-white/70 backdrop-blur-sm border-white/20">
-              <CardHeader>
-                <CardTitle>Impact Timeline</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="flex items-center gap-4 p-3 bg-green-50 rounded-lg">
-                    <div className="w-2 h-2 bg-green-600 rounded-full"></div>
-                    <div className="flex-1">
-                      <p className="font-medium">Carbon Sequestration Milestone</p>
-                      <p className="text-sm text-gray-600">Achieved 100 tCO₂ offset across portfolio</p>
-                    </div>
-                    <p className="text-sm text-gray-500">2 weeks ago</p>
-                  </div>
-                  <div className="flex items-center gap-4 p-3 bg-blue-50 rounded-lg">
-                    <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
-                    <div className="flex-1">
-                      <p className="font-medium">Community Impact Achievement</p>
-                      <p className="text-sm text-gray-600">25 new jobs created in rural communities</p>
-                    </div>
-                    <p className="text-sm text-gray-500">1 month ago</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
           </TabsContent>
 
-          {/* Analytics Tab */}
-          <TabsContent value="analytics" className="space-y-4">
+          {/* Deal Flow Management Tab */}
+          <TabsContent value="deals" className="space-y-4">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <Card className="bg-white/70 backdrop-blur-sm border-white/20">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <BarChart3 className="h-5 w-5 text-purple-600" />
-                    Portfolio Performance
+                    <FileText className="h-5 w-5 text-green-600" />
+                    Deal Pipeline
                   </CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div className="flex justify-between items-center">
-                      <span>Total Portfolio Return</span>
-                      <span className="font-bold text-green-600">+{totalReturn.toFixed(1)}%</span>
+                <CardContent className="space-y-4">
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center p-3 bg-green-50 rounded-lg">
+                      <div>
+                        <div className="font-medium text-sm">Sourcing</div>
+                        <div className="text-xs text-gray-600">45 opportunities</div>
+                      </div>
+                      <div className="text-green-700 font-bold">$125M</div>
                     </div>
-                    <div className="flex justify-between items-center">
-                      <span>Best Performing Investment</span>
-                      <span className="font-bold">Circular Waste Hub (+10.0%)</span>
+                    
+                    <div className="flex justify-between items-center p-3 bg-blue-50 rounded-lg">
+                      <div>
+                        <div className="font-medium text-sm">Due Diligence</div>
+                        <div className="text-xs text-gray-600">12 deals</div>
+                      </div>
+                      <div className="text-blue-700 font-bold">$48M</div>
                     </div>
-                    <div className="flex justify-between items-center">
-                      <span>Average Impact Score</span>
-                      <span className="font-bold text-blue-600">93/100</span>
+                    
+                    <div className="flex justify-between items-center p-3 bg-purple-50 rounded-lg">
+                      <div>
+                        <div className="font-medium text-sm">Investment Committee</div>
+                        <div className="text-xs text-gray-600">5 deals</div>
+                      </div>
+                      <div className="text-purple-700 font-bold">$22M</div>
                     </div>
-                    <div className="flex justify-between items-center">
-                      <span>Risk-Adjusted Return</span>
-                      <span className="font-bold">8.2%</span>
+                    
+                    <div className="flex justify-between items-center p-3 bg-orange-50 rounded-lg">
+                      <div>
+                        <div className="font-medium text-sm">Term Sheet</div>
+                        <div className="text-xs text-gray-600">3 deals</div>
+                      </div>
+                      <div className="text-orange-700 font-bold">$15M</div>
                     </div>
                   </div>
                 </CardContent>
@@ -456,34 +462,55 @@ export default function InvestorDashboardFlow() {
               <Card className="bg-white/70 backdrop-blur-sm border-white/20">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <Activity className="h-5 w-5 text-orange-600" />
-                    Investment Allocation
+                    <Users className="h-5 w-5 text-blue-600" />
+                    Recent Deal Activity
                   </CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div>
-                      <div className="flex justify-between text-sm mb-1">
-                        <span>Agriculture</span>
-                        <span>16.7%</span>
+                <CardContent className="space-y-4">
+                  <div className="space-y-3">
+                    <div className="p-3 border rounded-lg">
+                      <div className="flex justify-between items-start mb-2">
+                        <div>
+                          <div className="font-medium text-sm">Ocean Kelp Restoration</div>
+                          <div className="text-xs text-gray-600">Series A • $8M</div>
+                        </div>
+                        <Badge className="bg-green-100 text-green-800">Closed</Badge>
                       </div>
-                      <Progress value={16.7} />
+                      <div className="flex items-center gap-2 text-xs text-gray-600">
+                        <Calendar className="h-3 w-3" />
+                        <span>Completed 2 days ago</span>
+                      </div>
                     </div>
-                    <div>
-                      <div className="flex justify-between text-sm mb-1">
-                        <span>Blue Economy</span>
-                        <span>33.3%</span>
+                    
+                    <div className="p-3 border rounded-lg">
+                      <div className="flex justify-between items-start mb-2">
+                        <div>
+                          <div className="font-medium text-sm">Regenerative Cotton Farm</div>
+                          <div className="text-xs text-gray-600">Growth • $12M</div>
+                        </div>
+                        <Badge className="bg-blue-100 text-blue-800">Due Diligence</Badge>
                       </div>
-                      <Progress value={33.3} />
+                      <div className="flex items-center gap-2 text-xs text-gray-600">
+                        <Calendar className="h-3 w-3" />
+                        <span>Review in progress</span>
+                      </div>
                     </div>
-                    <div>
-                      <div className="flex justify-between text-sm mb-1">
-                        <span>Circular Economy</span>
-                        <span>50.0%</span>
+                    
+                    <div className="p-3 border rounded-lg">
+                      <div className="flex justify-between items-start mb-2">
+                        <div>
+                          <div className="font-medium text-sm">Carbon Capture Technology</div>
+                          <div className="text-xs text-gray-600">Series B • $25M</div>
+                        </div>
+                        <Badge className="bg-yellow-100 text-yellow-800">Term Sheet</Badge>
                       </div>
-                      <Progress value={50.0} />
+                      <div className="flex items-center gap-2 text-xs text-gray-600">
+                        <Calendar className="h-3 w-3" />
+                        <span>Negotiating terms</span>
+                      </div>
                     </div>
                   </div>
+                  <Button className="w-full">View All Deals</Button>
                 </CardContent>
               </Card>
             </div>
