@@ -1,15 +1,17 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 
 const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const { user } = useAuth();
 
   const navLinks = [
-    { name: "Vision", href: "#vision" },
-    { name: "Ecosystem", href: "#ecosystem" },
-    { name: "Stakeholders", href: "#stakeholders" },
-    { name: "Join Us", href: "#join" },
+    { name: "Vision", href: "/#vision" },
+    { name: "Ecosystem", href: "/#ecosystem" },
+    { name: "Stakeholders", href: "/#stakeholders" },
+    { name: "How It Works", href: "/how-it-works" },
   ];
 
   return (
@@ -17,7 +19,7 @@ const Navigation = () => {
       <div className="container mx-auto px-6 py-4">
         <div className="flex items-center justify-between">
           {/* Logo */}
-          <a href="#" className="flex items-center gap-3">
+          <a href="/" className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-gradient-to-br from-forest to-ocean flex items-center justify-center">
               <span className="text-background font-serif text-xl">A</span>
             </div>
@@ -35,9 +37,15 @@ const Navigation = () => {
                 {link.name}
               </a>
             ))}
-            <Button variant="hero" size="sm">
-              Get Started
-            </Button>
+            {user ? (
+              <Button variant="hero" size="sm" onClick={() => window.location.href = "/dashboard"}>
+                Dashboard
+              </Button>
+            ) : (
+              <Button variant="hero" size="sm" onClick={() => window.location.href = "/auth"}>
+                Get Started
+              </Button>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -63,9 +71,15 @@ const Navigation = () => {
                   {link.name}
                 </a>
               ))}
-              <Button variant="hero" className="mt-2">
-                Get Started
-              </Button>
+              {user ? (
+                <Button variant="hero" className="mt-2" onClick={() => window.location.href = "/dashboard"}>
+                  Dashboard
+                </Button>
+              ) : (
+                <Button variant="hero" className="mt-2" onClick={() => window.location.href = "/auth"}>
+                  Get Started
+                </Button>
+              )}
             </div>
           </div>
         )}
