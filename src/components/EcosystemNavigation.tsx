@@ -6,7 +6,8 @@ import { Badge } from '@/components/ui/badge';
 import { 
   Menu, Home, Users, TrendingUp, Waves, Heart, Recycle, 
   Sprout, Brain, Network, Shield, ArrowRightLeft, Target,
-  Activity, FileText, DollarSign, Award, Lightbulb
+  Activity, FileText, DollarSign, Award, Lightbulb, BarChart3,
+  Leaf, Code
 } from 'lucide-react';
 
 const navigationSections = [

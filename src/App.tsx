@@ -41,6 +41,11 @@ import ProjectRegistrationFlow from "./pages/ProjectRegistrationFlow";
 import InvestmentFlow from "./pages/InvestmentFlow";
 import PractitionerDashboardFlow from "./pages/PractitionerDashboardFlow";
 import InvestorDashboardFlow from "./pages/InvestorDashboardFlow";
+// Enhanced Features
+import AdvancedAnalytics from "./pages/AdvancedAnalytics";
+import CarbonMarketplace from "./pages/CarbonMarketplace";
+import APIMarketplace from "./pages/APIMarketplace";
+import SystemMonitoring from "./pages/SystemMonitoring";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient({
@@ -72,6 +77,12 @@ const App = () => (
               <Route path="/investment-flow" element={<InvestmentFlow />} />
               <Route path="/practitioner-flow" element={<PractitionerDashboardFlow />} />
               <Route path="/investor-flow" element={<InvestorDashboardFlow />} />
+              
+              {/* Enhanced Features */}
+              <Route path="/analytics" element={<AdvancedAnalytics />} />
+              <Route path="/carbon-marketplace" element={<CarbonMarketplace />} />
+              <Route path="/api-marketplace" element={<APIMarketplace />} />
+              <Route path="/system-monitoring" element={<SystemMonitoring />} />
               
               {/* Main Application Routes */}
               <Route path="/dashboard" element={<><EcosystemNavigation /><div className="md:ml-80"><Dashboard /></div></>} />
