@@ -11,6 +11,13 @@ import Dashboard from "./pages/Dashboard";
 import HowItWorks from "./pages/HowItWorks";
 import ProjectDetail from "./pages/ProjectDetail";
 import AdminPanel from "./pages/AdminPanel";
+import BusinessModel from "./pages/BusinessModel";
+import SubscriptionPlans from "./pages/SubscriptionPlans";
+import StakeholderSelector from "./pages/StakeholderSelector";
+import PractitionerDashboard from "./pages/PractitionerDashboard";
+import InvestorDashboard from "./pages/InvestorDashboard";
+import GovernmentDashboard from "./pages/GovernmentDashboard";
+import BuilderDashboard from "./pages/BuilderDashboard";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -30,6 +37,13 @@ const App = () => (
             <Route path="/how-it-works" element={<HowItWorks />} />
             <Route path="/project/:id" element={<ProjectDetail />} />
             <Route path="/admin" element={<AdminPanel />} />
+            <Route path="/business-model" element={<BusinessModel />} />
+            <Route path="/pricing" element={<SubscriptionPlans />} />
+            <Route path="/enterprise" element={<StakeholderSelector />} />
+            <Route path="/practitioner" element={<PractitionerDashboard />} />
+            <Route path="/investor" element={<InvestorDashboard />} />
+            <Route path="/government" element={<GovernmentDashboard />} />
+            <Route path="/builder" element={<BuilderDashboard />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

@@ -9,7 +9,7 @@ import { Progress } from "@/components/ui/progress";
 import { motion } from "framer-motion";
 import {
   Leaf, Waves, Heart, RefreshCw, Zap, TrendingUp,
-  LogOut, Menu, X, BarChart3, Globe, Users, MapPin, Target, Settings
+  LogOut, Menu, X, BarChart3, Globe, Users, MapPin, Target, Settings, DollarSign
 } from "lucide-react";
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip,
@@ -174,6 +174,14 @@ const Dashboard = () => {
             <a href="/dashboard" className="flex items-center gap-3 px-4 py-3 rounded-lg bg-primary/10 text-primary">
               <BarChart3 className="w-5 h-5" />
               Dashboard
+            </a>
+            <a href="/business-model" className="flex items-center gap-3 px-4 py-3 rounded-lg text-muted-foreground hover:bg-muted transition-colors">
+              <TrendingUp className="w-5 h-5" />
+              Business Model
+            </a>
+            <a href="/pricing" className="flex items-center gap-3 px-4 py-3 rounded-lg text-muted-foreground hover:bg-muted transition-colors">
+              <DollarSign className="w-5 h-5" />
+              Pricing
             </a>
             <a href="/how-it-works" className="flex items-center gap-3 px-4 py-3 rounded-lg text-muted-foreground hover:bg-muted transition-colors">
               <Globe className="w-5 h-5" />
