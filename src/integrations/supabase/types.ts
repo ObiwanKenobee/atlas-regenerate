@@ -44,6 +44,51 @@ export type Database = {
         }
         Relationships: []
       }
+      investments: {
+        Row: {
+          amount: number
+          created_at: string
+          id: string
+          investment_type: string | null
+          project_id: string | null
+          status: string | null
+          user_id: string | null
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          id?: string
+          investment_type?: string | null
+          project_id?: string | null
+          status?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          id?: string
+          investment_type?: string | null
+          project_id?: string | null
+          status?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "investments_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "investments_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -51,6 +96,7 @@ export type Database = {
           created_at: string
           full_name: string | null
           id: string
+          is_admin: boolean | null
           onboarding_completed: boolean | null
           organization: string | null
           role: string | null
@@ -63,6 +109,7 @@ export type Database = {
           created_at?: string
           full_name?: string | null
           id?: string
+          is_admin?: boolean | null
           onboarding_completed?: boolean | null
           organization?: string | null
           role?: string | null
@@ -75,11 +122,101 @@ export type Database = {
           created_at?: string
           full_name?: string | null
           id?: string
+          is_admin?: boolean | null
           onboarding_completed?: boolean | null
           organization?: string | null
           role?: string | null
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      project_metrics: {
+        Row: {
+          category: string | null
+          created_at: string
+          id: string
+          metric_name: string
+          metric_unit: string | null
+          metric_value: number | null
+          project_id: string | null
+          recorded_at: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          id?: string
+          metric_name: string
+          metric_unit?: string | null
+          metric_value?: number | null
+          project_id?: string | null
+          recorded_at?: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          id?: string
+          metric_name?: string
+          metric_unit?: string | null
+          metric_value?: number | null
+          project_id?: string | null
+          recorded_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_metrics_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      projects: {
+        Row: {
+          created_at: string
+          description: string | null
+          funding_goal: number | null
+          funding_raised: number | null
+          id: string
+          image_url: string | null
+          latitude: number | null
+          location: string | null
+          longitude: number | null
+          project_type: string | null
+          status: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          funding_goal?: number | null
+          funding_raised?: number | null
+          id?: string
+          image_url?: string | null
+          latitude?: number | null
+          location?: string | null
+          longitude?: number | null
+          project_type?: string | null
+          status?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          funding_goal?: number | null
+          funding_raised?: number | null
+          id?: string
+          image_url?: string | null
+          latitude?: number | null
+          location?: string | null
+          longitude?: number | null
+          project_type?: string | null
+          status?: string | null
+          title?: string
+          updated_at?: string
         }
         Relationships: []
       }

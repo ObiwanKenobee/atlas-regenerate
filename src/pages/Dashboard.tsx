@@ -3,10 +3,13 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
 import { motion } from "framer-motion";
 import {
   Leaf, Waves, Heart, RefreshCw, Zap, TrendingUp,
-  LogOut, Menu, X, BarChart3, Globe, Users
+  LogOut, Menu, X, BarChart3, Globe, Users, MapPin, Target, Settings
 } from "lucide-react";
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip,
@@ -21,10 +24,28 @@ interface ImpactMetric {
   category: string;
 }
 
+interface Project {
+  id: string;
+  title: string;
+  description: string;
+  location: string;
+  funding_goal: number;
+  funding_raised: number;
+  project_type: string;
+  status: string;
+  image_url: string;
+}
+
+interface Profile {
+  is_admin: boolean;
+}
+
 const Dashboard = () => {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
   const [metrics, setMetrics] = useState<ImpactMetric[]>([]);
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [profile, setProfile] = useState<Profile | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -33,15 +54,35 @@ const Dashboard = () => {
       navigate("/auth");
       return;
     }
-    fetchMetrics();
+    fetchData();
   }, [user, navigate]);
 
-  const fetchMetrics = async () => {
-    const { data } = await supabase.from("impact_metrics").select("*");
-    if (data) {
-      setMetrics(data);
+  const fetchData = async () => {
+    try {
+      // Fetch metrics
+      const { data: metricsData } = await supabase.from("impact_metrics").select("*");
+      if (metricsData) setMetrics(metricsData);
+
+      // Fetch projects
+      const { data: projectsData } = await supabase
+        .from("projects")
+        .select("*")
+        .eq("status", "active")
+        .limit(6);
+      if (projectsData) setProjects(projectsData);
+
+      // Fetch user profile
+      const { data: profileData } = await supabase
+        .from("profiles")
+        .select("is_admin")
+        .eq("user_id", user?.id)
+        .single();
+      if (profileData) setProfile(profileData);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   const handleSignOut = async () => {
@@ -94,6 +135,15 @@ const Dashboard = () => {
     }
   };
 
+  const getProjectIcon = (type: string) => {
+    switch (type) {
+      case "agriculture": return Leaf;
+      case "marine": return Waves;
+      case "forestry": return Globe;
+      default: return Target;
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -129,6 +179,12 @@ const Dashboard = () => {
               <Globe className="w-5 h-5" />
               How It Works
             </a>
+            {profile?.is_admin && (
+              <a href="/admin" className="flex items-center gap-3 px-4 py-3 rounded-lg text-muted-foreground hover:bg-muted transition-colors">
+                <Settings className="w-5 h-5" />
+                Admin Panel
+              </a>
+            )}
           </nav>
 
           {/* User */}
@@ -139,7 +195,9 @@ const Dashboard = () => {
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium truncate">{user?.email}</p>
-                <p className="text-xs text-muted-foreground">Member</p>
+                <p className="text-xs text-muted-foreground">
+                  {profile?.is_admin ? "Admin" : "Member"}
+                </p>
               </div>
             </div>
             <Button variant="ghost" onClick={handleSignOut} className="w-full justify-start text-muted-foreground">
@@ -207,13 +265,72 @@ const Dashboard = () => {
             })}
           </motion.div>
 
+          {/* Projects Section */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="mb-8"
+          >
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="font-serif text-2xl">Active Projects</h2>
+              <Button variant="outline" size="sm">
+                View All
+              </Button>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {projects.map((project) => {
+                const Icon = getProjectIcon(project.project_type);
+                const fundingProgress = (project.funding_raised / project.funding_goal) * 100;
+                
+                return (
+                  <Card key={project.id} className="glass hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate(`/project/${project.id}`)}>
+                    <CardHeader className="pb-3">
+                      <div className="flex items-start gap-3">
+                        <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                          <Icon className="w-5 h-5 text-primary" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <CardTitle className="text-lg line-clamp-1">{project.title}</CardTitle>
+                          <div className="flex items-center gap-1 text-sm text-muted-foreground mt-1">
+                            <MapPin className="w-3 h-3" />
+                            <span className="truncate">{project.location}</span>
+                          </div>
+                        </div>
+                        <Badge variant="outline" className="capitalize">
+                          {project.project_type}
+                        </Badge>
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
+                        {project.description}
+                      </p>
+                      <div className="space-y-2">
+                        <div className="flex justify-between text-sm">
+                          <span>Funding Progress</span>
+                          <span>{fundingProgress.toFixed(1)}%</span>
+                        </div>
+                        <Progress value={fundingProgress} className="h-2" />
+                        <div className="flex justify-between text-sm text-muted-foreground">
+                          <span>${project.funding_raised.toLocaleString()}</span>
+                          <span>${project.funding_goal.toLocaleString()}</span>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
+          </motion.div>
+
           {/* Charts Row */}
           <div className="grid lg:grid-cols-2 gap-6 mb-8">
             {/* Area Chart */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
+              transition={{ delay: 0.3 }}
               className="glass rounded-xl p-6"
             >
               <h3 className="font-serif text-xl mb-4">Impact Growth</h3>
@@ -261,7 +378,7 @@ const Dashboard = () => {
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
+              transition={{ delay: 0.4 }}
               className="glass rounded-xl p-6"
             >
               <h3 className="font-serif text-xl mb-4">Impact Distribution</h3>
@@ -306,7 +423,7 @@ const Dashboard = () => {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
+            transition={{ delay: 0.5 }}
             className="glass rounded-xl p-6"
           >
             <h3 className="font-serif text-xl mb-4">Projects by Sector</h3>
