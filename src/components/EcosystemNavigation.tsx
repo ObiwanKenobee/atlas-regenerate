@@ -100,19 +100,19 @@ export default function EcosystemNavigation() {
                   key={item.path}
                   to={item.path}
                   onClick={() => setIsOpen(false)}
-                  className={`flex items-center gap-3 p-2 rounded-lg transition-colors ${
+                  className={`flex items-center gap-3 p-3 rounded-lg transition-colors ${
                     isActive 
                       ? 'bg-green-100 text-green-700 border border-green-200' 
                       : 'hover:bg-gray-100 text-gray-700'
                   }`}
                 >
-                  <Icon className="h-4 w-4" />
-                  <div className="flex-1">
-                    <p className="text-sm font-medium">{item.name}</p>
-                    <p className="text-xs text-gray-500">{item.description}</p>
+                  <Icon className="h-4 w-4 flex-shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium truncate">{item.name}</p>
+                    <p className="text-xs text-gray-500 line-clamp-2">{item.description}</p>
                   </div>
                   {isActive && (
-                    <Badge variant="secondary" className="text-xs">
+                    <Badge variant="secondary" className="text-xs flex-shrink-0">
                       Active
                     </Badge>
                   )}
@@ -123,12 +123,12 @@ export default function EcosystemNavigation() {
         </div>
       ))}
 
-      <div className="pt-4 border-t">
-        <div className="bg-gradient-to-r from-green-50 to-blue-50 p-3 rounded-lg">
-          <h4 className="text-sm font-semibold text-gray-800 mb-1">
+      <div className="pt-4 border-t mt-4">
+        <div className="bg-gradient-to-r from-green-50 to-blue-50 p-4 rounded-lg">
+          <h4 className="text-sm font-semibold text-gray-800 mb-2">
             Regenerative Impact
           </h4>
-          <p className="text-xs text-gray-600">
+          <p className="text-xs text-gray-600 leading-relaxed">
             Every action creates positive environmental and social outcomes
           </p>
         </div>
@@ -141,11 +141,11 @@ export default function EcosystemNavigation() {
       {/* Mobile Navigation */}
       <Sheet open={isOpen} onOpenChange={setIsOpen}>
         <SheetTrigger asChild>
-          <Button variant="outline" size="icon" className="md:hidden fixed top-4 left-4 z-50">
+          <Button variant="outline" size="icon" className="md:hidden fixed top-4 left-4 z-50 bg-white shadow-md">
             <Menu className="h-4 w-4" />
           </Button>
         </SheetTrigger>
-        <SheetContent side="left" className="w-80 overflow-y-auto">
+        <SheetContent side="left" className="w-full sm:w-80 overflow-y-auto p-0">
           <NavigationContent />
         </SheetContent>
       </Sheet>

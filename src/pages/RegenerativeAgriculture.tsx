@@ -156,53 +156,53 @@ export default function RegenerativeAgriculture() {
   }
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
-      <div className="flex items-center gap-3 mb-6">
-        <Sprout className="h-8 w-8 text-green-600" />
-        <h1 className="text-3xl font-bold">Regenerative Agriculture</h1>
+    <div className="md:ml-80 p-4 sm:p-6 space-y-4 sm:space-y-6">
+      <div className="flex items-center gap-3 mb-4 sm:mb-6">
+        <Sprout className="h-6 w-6 sm:h-8 sm:w-8 text-green-600" />
+        <h1 className="text-2xl sm:text-3xl font-bold">Regenerative Agriculture</h1>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-4 sm:mb-6">
         <Card>
-          <CardContent className="p-4">
+          <CardContent className="p-3 sm:p-4">
             <div className="flex items-center gap-2">
-              <Sprout className="h-5 w-5 text-green-600" />
+              <Sprout className="h-4 w-4 sm:h-5 sm:w-5 text-green-600" />
               <div>
-                <p className="text-sm text-gray-600">Total Farms</p>
-                <p className="text-2xl font-bold">{farms.length}</p>
+                <p className="text-xs sm:text-sm text-gray-600">Total Farms</p>
+                <p className="text-xl sm:text-2xl font-bold">{farms.length}</p>
               </div>
             </div>
           </CardContent>
         </Card>
         <Card>
-          <CardContent className="p-4">
+          <CardContent className="p-3 sm:p-4">
             <div className="flex items-center gap-2">
-              <TrendingUp className="h-5 w-5 text-blue-600" />
+              <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600" />
               <div>
-                <p className="text-sm text-gray-600">Total Area</p>
-                <p className="text-2xl font-bold">{getTotalFarmArea().toLocaleString()} ha</p>
+                <p className="text-xs sm:text-sm text-gray-600">Total Area</p>
+                <p className="text-xl sm:text-2xl font-bold">{getTotalFarmArea().toLocaleString()} ha</p>
               </div>
             </div>
           </CardContent>
         </Card>
         <Card>
-          <CardContent className="p-4">
+          <CardContent className="p-3 sm:p-4">
             <div className="flex items-center gap-2">
-              <Leaf className="h-5 w-5 text-green-600" />
+              <Leaf className="h-4 w-4 sm:h-5 sm:w-5 text-green-600" />
               <div>
-                <p className="text-sm text-gray-600">Carbon Sequestered</p>
-                <p className="text-2xl font-bold">{getTotalCarbonSequestered().toFixed(1)} tC</p>
+                <p className="text-xs sm:text-sm text-gray-600">Carbon Sequestered</p>
+                <p className="text-xl sm:text-2xl font-bold">{getTotalCarbonSequestered().toFixed(1)} tC</p>
               </div>
             </div>
           </CardContent>
         </Card>
         <Card>
-          <CardContent className="p-4">
+          <CardContent className="p-3 sm:p-4">
             <div className="flex items-center gap-2">
-              <Award className="h-5 w-5 text-purple-600" />
+              <Award className="h-4 w-4 sm:h-5 sm:w-5 text-purple-600" />
               <div>
-                <p className="text-sm text-gray-600">Active Practices</p>
-                <p className="text-2xl font-bold">{getActivePracticesCount()}</p>
+                <p className="text-xs sm:text-sm text-gray-600">Active Practices</p>
+                <p className="text-xl sm:text-2xl font-bold">{getActivePracticesCount()}</p>
               </div>
             </div>
           </CardContent>
@@ -210,56 +210,54 @@ export default function RegenerativeAgriculture() {
       </div>
 
       <Tabs defaultValue="farms" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="farms">Farms</TabsTrigger>
-          <TabsTrigger value="soil">Soil Health</TabsTrigger>
-          <TabsTrigger value="carbon">Carbon Sequestration</TabsTrigger>
-          <TabsTrigger value="practices">Sustainable Practices</TabsTrigger>
-          <TabsTrigger value="biodiversity">Biodiversity</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 lg:grid-cols-5">
+          <TabsTrigger value="farms" className="text-xs sm:text-sm">Farms</TabsTrigger>
+          <TabsTrigger value="soil" className="text-xs sm:text-sm">Soil Health</TabsTrigger>
+          <TabsTrigger value="carbon" className="text-xs sm:text-sm">Carbon</TabsTrigger>
+          <TabsTrigger value="practices" className="text-xs sm:text-sm">Practices</TabsTrigger>
+          <TabsTrigger value="biodiversity" className="text-xs sm:text-sm">Biodiversity</TabsTrigger>
         </TabsList>
 
         <TabsContent value="farms" className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
             {farms.map((farm) => (
               <Card key={farm.id}>
-                <CardHeader>
+                <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">
-                    <CardTitle className="flex items-center gap-2">
+                    <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
                       {getFarmingSystemIcon(farm.farming_system)}
-                      {farm.farm_name}
+                      <span className="truncate">{farm.farm_name}</span>
                     </CardTitle>
-                    <Badge variant="outline">
+                    <Badge variant="outline" className="text-xs flex-shrink-0">
                       {farm.farm_size_hectares} ha
                     </Badge>
                   </div>
                 </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    <div>
-                      <p className="text-sm text-gray-600">Farmer</p>
-                      <p className="font-semibold">{farm.farmer_name}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-600">Farming System</p>
-                      <p className="font-semibold capitalize">{farm.farming_system.replace('_', ' ')}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-600">Transition Started</p>
-                      <p className="font-semibold">{new Date(farm.transition_start_date).toLocaleDateString()}</p>
-                    </div>
-                    {farm.certification_status.length > 0 && (
-                      <div>
-                        <p className="text-sm text-gray-600 mb-2">Certifications</p>
-                        <div className="flex flex-wrap gap-1">
-                          {farm.certification_status.map((cert, index) => (
-                            <Badge key={index} variant="secondary" className="text-xs">
-                              {cert}
-                            </Badge>
-                          ))}
-                        </div>
-                      </div>
-                    )}
+                <CardContent className="space-y-3">
+                  <div>
+                    <p className="text-xs sm:text-sm text-gray-600">Farmer</p>
+                    <p className="font-semibold text-sm sm:text-base truncate">{farm.farmer_name}</p>
                   </div>
+                  <div>
+                    <p className="text-xs sm:text-sm text-gray-600">Farming System</p>
+                    <p className="font-semibold text-sm sm:text-base capitalize">{farm.farming_system.replace('_', ' ')}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs sm:text-sm text-gray-600">Transition Started</p>
+                    <p className="font-semibold text-sm sm:text-base">{new Date(farm.transition_start_date).toLocaleDateString()}</p>
+                  </div>
+                  {farm.certification_status.length > 0 && (
+                    <div>
+                      <p className="text-xs sm:text-sm text-gray-600 mb-2">Certifications</p>
+                      <div className="flex flex-wrap gap-1">
+                        {farm.certification_status.map((cert, index) => (
+                          <Badge key={index} variant="secondary" className="text-xs">
+                            {cert}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             ))}
@@ -267,53 +265,51 @@ export default function RegenerativeAgriculture() {
         </TabsContent>
 
         <TabsContent value="soil" className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4">
             {soilHealth.map((soil) => (
               <Card key={soil.id}>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <TrendingUp className="h-5 w-5" />
+                <CardHeader className="pb-3">
+                  <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                    <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5" />
                     Soil Health Assessment
                   </CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    <div className="grid grid-cols-2 gap-4 text-sm">
-                      <div>
-                        <p className="text-gray-600">Organic Matter</p>
-                        <p className="font-semibold">{soil.soil_organic_matter.toFixed(2)}%</p>
-                      </div>
-                      <div>
-                        <p className="text-gray-600">pH Level</p>
-                        <p className="font-semibold">{soil.soil_ph.toFixed(1)}</p>
-                      </div>
-                      <div>
-                        <p className="text-gray-600">Water Infiltration</p>
-                        <p className="font-semibold">{soil.water_infiltration_rate.toFixed(1)} mm/hr</p>
-                      </div>
-                      <div>
-                        <p className="text-gray-600">Earthworms</p>
-                        <p className="font-semibold">{soil.earthworm_count}/m²</p>
-                      </div>
+                <CardContent className="space-y-3">
+                  <div className="grid grid-cols-2 gap-3 sm:gap-4 text-sm">
+                    <div>
+                      <p className="text-gray-600 text-xs sm:text-sm">Organic Matter</p>
+                      <p className="font-semibold">{soil.soil_organic_matter.toFixed(2)}%</p>
                     </div>
                     <div>
-                      <div className="flex justify-between text-sm mb-1">
-                        <span>Overall Soil Health</span>
-                        <span>{(getHealthScore(soil) * 100).toFixed(0)}%</span>
-                      </div>
-                      <Progress value={getHealthScore(soil) * 100} />
+                      <p className="text-gray-600 text-xs sm:text-sm">pH Level</p>
+                      <p className="font-semibold">{soil.soil_ph.toFixed(1)}</p>
                     </div>
                     <div>
-                      <div className="flex justify-between text-sm mb-1">
-                        <span>Aggregate Stability</span>
-                        <span>{soil.aggregate_stability.toFixed(1)}%</span>
-                      </div>
-                      <Progress value={soil.aggregate_stability} />
+                      <p className="text-gray-600 text-xs sm:text-sm">Water Infiltration</p>
+                      <p className="font-semibold">{soil.water_infiltration_rate.toFixed(1)} mm/hr</p>
                     </div>
-                    <p className="text-xs text-gray-500">
-                      Measured: {new Date(soil.measured_at).toLocaleDateString()}
-                    </p>
+                    <div>
+                      <p className="text-gray-600 text-xs sm:text-sm">Earthworms</p>
+                      <p className="font-semibold">{soil.earthworm_count}/m²</p>
+                    </div>
                   </div>
+                  <div>
+                    <div className="flex justify-between text-sm mb-1">
+                      <span>Overall Soil Health</span>
+                      <span>{(getHealthScore(soil) * 100).toFixed(0)}%</span>
+                    </div>
+                    <Progress value={getHealthScore(soil) * 100} />
+                  </div>
+                  <div>
+                    <div className="flex justify-between text-sm mb-1">
+                      <span>Aggregate Stability</span>
+                      <span>{soil.aggregate_stability.toFixed(1)}%</span>
+                    </div>
+                    <Progress value={soil.aggregate_stability} />
+                  </div>
+                  <p className="text-xs text-gray-500">
+                    Measured: {new Date(soil.measured_at).toLocaleDateString()}
+                  </p>
                 </CardContent>
               </Card>
             ))}
@@ -365,37 +361,35 @@ export default function RegenerativeAgriculture() {
         </TabsContent>
 
         <TabsContent value="practices" className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
             {practices.map((practice) => (
               <Card key={practice.id}>
-                <CardHeader>
+                <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">
-                    <CardTitle className="text-base">{practice.practice_name}</CardTitle>
-                    <Badge className={getStatusColor(practice.practice_status)}>
+                    <CardTitle className="text-sm sm:text-base line-clamp-2">{practice.practice_name}</CardTitle>
+                    <Badge className={getStatusColor(practice.practice_status)} size="sm">
                       {practice.practice_status}
                     </Badge>
                   </div>
                 </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    <div>
-                      <p className="text-sm text-gray-600">Category</p>
-                      <p className="font-semibold capitalize">{practice.practice_category.replace('_', ' ')}</p>
-                    </div>
-                    <div className="grid grid-cols-2 gap-2 text-sm">
-                      <div>
-                        <p className="text-gray-600">Area Applied</p>
-                        <p className="font-semibold">{practice.area_applied_hectares} ha</p>
-                      </div>
-                      <div>
-                        <p className="text-gray-600">Cost</p>
-                        <p className="font-semibold">${practice.implementation_cost?.toLocaleString() || 'N/A'}</p>
-                      </div>
-                    </div>
-                    <p className="text-xs text-gray-500">
-                      Implemented: {new Date(practice.implementation_date).toLocaleDateString()}
-                    </p>
+                <CardContent className="space-y-3">
+                  <div>
+                    <p className="text-xs sm:text-sm text-gray-600">Category</p>
+                    <p className="font-semibold text-sm capitalize">{practice.practice_category.replace('_', ' ')}</p>
                   </div>
+                  <div className="grid grid-cols-2 gap-2 text-sm">
+                    <div>
+                      <p className="text-gray-600 text-xs">Area Applied</p>
+                      <p className="font-semibold">{practice.area_applied_hectares} ha</p>
+                    </div>
+                    <div>
+                      <p className="text-gray-600 text-xs">Cost</p>
+                      <p className="font-semibold">${practice.implementation_cost?.toLocaleString() || 'N/A'}</p>
+                    </div>
+                  </div>
+                  <p className="text-xs text-gray-500">
+                    Implemented: {new Date(practice.implementation_date).toLocaleDateString()}
+                  </p>
                 </CardContent>
               </Card>
             ))}
@@ -403,45 +397,43 @@ export default function RegenerativeAgriculture() {
         </TabsContent>
 
         <TabsContent value="biodiversity" className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4">
             {biodiversity.map((bio) => (
               <Card key={bio.id}>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Bug className="h-5 w-5" />
-                    {bio.species_category} Monitoring
+                <CardHeader className="pb-3">
+                  <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                    <Bug className="h-4 w-4 sm:h-5 sm:w-5" />
+                    <span className="capitalize">{bio.species_category} Monitoring</span>
                   </CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    <div className="grid grid-cols-2 gap-4 text-sm">
-                      <div>
-                        <p className="text-gray-600">Species Count</p>
-                        <p className="font-semibold">{bio.species_count}</p>
-                      </div>
-                      <div>
-                        <p className="text-gray-600">Beneficial Species</p>
-                        <p className="font-semibold">{bio.beneficial_species_count}</p>
-                      </div>
+                <CardContent className="space-y-3">
+                  <div className="grid grid-cols-2 gap-3 sm:gap-4 text-sm">
+                    <div>
+                      <p className="text-gray-600 text-xs sm:text-sm">Species Count</p>
+                      <p className="font-semibold">{bio.species_count}</p>
                     </div>
                     <div>
-                      <div className="flex justify-between text-sm mb-1">
-                        <span>Diversity Index</span>
-                        <span>{bio.species_diversity_index.toFixed(3)}</span>
-                      </div>
-                      <Progress value={(bio.species_diversity_index / 5) * 100} />
+                      <p className="text-gray-600 text-xs sm:text-sm">Beneficial Species</p>
+                      <p className="font-semibold">{bio.beneficial_species_count}</p>
                     </div>
-                    <div>
-                      <div className="flex justify-between text-sm mb-1">
-                        <span>Habitat Quality</span>
-                        <span>{(bio.habitat_quality_score * 100).toFixed(0)}%</span>
-                      </div>
-                      <Progress value={bio.habitat_quality_score * 100} />
-                    </div>
-                    <p className="text-xs text-gray-500">
-                      Observed: {new Date(bio.observed_at).toLocaleDateString()}
-                    </p>
                   </div>
+                  <div>
+                    <div className="flex justify-between text-sm mb-1">
+                      <span>Diversity Index</span>
+                      <span>{bio.species_diversity_index.toFixed(3)}</span>
+                    </div>
+                    <Progress value={(bio.species_diversity_index / 5) * 100} />
+                  </div>
+                  <div>
+                    <div className="flex justify-between text-sm mb-1">
+                      <span>Habitat Quality</span>
+                      <span>{(bio.habitat_quality_score * 100).toFixed(0)}%</span>
+                    </div>
+                    <Progress value={bio.habitat_quality_score * 100} />
+                  </div>
+                  <p className="text-xs text-gray-500">
+                    Observed: {new Date(bio.observed_at).toLocaleDateString()}
+                  </p>
                 </CardContent>
               </Card>
             ))}

@@ -118,30 +118,30 @@ export default function EcosystemDashboard() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-blue-50 to-purple-50">
-      <div className="md:ml-80 p-6">
+      <div className="md:ml-80 p-4 sm:p-6">
         {/* Header */}
-        <div className="mb-8">
+        <div className="mb-6 sm:mb-8">
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-blue-500 rounded-xl flex items-center justify-center">
-              <Network className="h-6 w-6 text-white" />
+            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-r from-green-500 to-blue-500 rounded-xl flex items-center justify-center">
+              <Network className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Atlas Sanctum Ecosystem</h1>
-              <p className="text-gray-600">Regenerative systems for planetary and human wellbeing</p>
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Atlas Sanctum Ecosystem</h1>
+              <p className="text-sm sm:text-base text-gray-600">Regenerative systems for planetary and human wellbeing</p>
             </div>
           </div>
           
-          <div className="bg-white/70 backdrop-blur-sm rounded-xl p-4 border border-white/20">
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+          <div className="bg-white/70 backdrop-blur-sm rounded-xl p-3 sm:p-4 border border-white/20">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
               {globalMetrics.map((metric) => {
                 const Icon = metric.icon;
                 return (
                   <div key={metric.label} className="text-center">
                     <div className="flex items-center justify-center mb-2">
-                      <Icon className="h-5 w-5 text-gray-600" />
+                      <Icon className="h-4 w-4 sm:h-5 sm:w-5 text-gray-600" />
                     </div>
-                    <p className="text-2xl font-bold text-gray-900">{metric.value}</p>
-                    <p className="text-xs text-gray-600">{metric.label}</p>
+                    <p className="text-lg sm:text-2xl font-bold text-gray-900">{metric.value}</p>
+                    <p className="text-xs text-gray-600 line-clamp-2">{metric.label}</p>
                     <Badge variant="secondary" className="text-xs mt-1">
                       {metric.change}
                     </Badge>
@@ -153,40 +153,40 @@ export default function EcosystemDashboard() {
         </div>
 
         {/* Ecosystem Modules */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
           {ecosystemModules.map((module) => {
             const Icon = module.icon;
             return (
               <Card key={module.name} className="group hover:shadow-lg transition-all duration-300 bg-white/70 backdrop-blur-sm border-white/20">
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">
-                    <div className={`w-10 h-10 bg-gradient-to-r ${module.color} rounded-lg flex items-center justify-center`}>
-                      <Icon className="h-5 w-5 text-white" />
+                    <div className={`w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-r ${module.color} rounded-lg flex items-center justify-center`}>
+                      <Icon className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
                     </div>
                     <Badge variant={module.status === 'active' ? 'default' : 'secondary'}>
                       {module.status}
                     </Badge>
                   </div>
-                  <CardTitle className="text-lg group-hover:text-green-600 transition-colors">
+                  <CardTitle className="text-base sm:text-lg group-hover:text-green-600 transition-colors line-clamp-2">
                     {module.name}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-sm text-gray-600 mb-4 line-clamp-2">
+                  <p className="text-sm text-gray-600 mb-4 line-clamp-3">
                     {module.description}
                   </p>
                   
                   <div className="space-y-2 mb-4">
                     {Object.entries(module.metrics).map(([key, value]) => (
                       <div key={key} className="flex justify-between text-sm">
-                        <span className="text-gray-600 capitalize">{key.replace(/([A-Z])/g, ' $1')}</span>
-                        <span className="font-semibold">{value}</span>
+                        <span className="text-gray-600 capitalize truncate">{key.replace(/([A-Z])/g, ' $1')}</span>
+                        <span className="font-semibold flex-shrink-0">{value}</span>
                       </div>
                     ))}
                   </div>
 
                   <Link to={module.path}>
-                    <Button className="w-full group-hover:bg-green-600 transition-colors">
+                    <Button className="w-full group-hover:bg-green-600 transition-colors text-sm">
                       <Zap className="h-4 w-4 mr-2" />
                       Explore System
                     </Button>
@@ -198,59 +198,59 @@ export default function EcosystemDashboard() {
         </div>
 
         {/* Quick Actions */}
-        <div className="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="mt-6 sm:mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           <Link to="/register-project">
             <Card className="hover:shadow-md transition-shadow cursor-pointer bg-white/70 backdrop-blur-sm border-white/20">
-              <CardContent className="p-4 text-center">
-                <Target className="h-8 w-8 text-green-600 mx-auto mb-2" />
-                <h3 className="font-semibold">Register Project</h3>
-                <p className="text-sm text-gray-600">Start your regenerative journey</p>
+              <CardContent className="p-3 sm:p-4 text-center">
+                <Target className="h-6 w-6 sm:h-8 sm:w-8 text-green-600 mx-auto mb-2" />
+                <h3 className="font-semibold text-sm sm:text-base">Register Project</h3>
+                <p className="text-xs sm:text-sm text-gray-600">Start your regenerative journey</p>
               </CardContent>
             </Card>
           </Link>
 
           <Link to="/invest">
             <Card className="hover:shadow-md transition-shadow cursor-pointer bg-white/70 backdrop-blur-sm border-white/20">
-              <CardContent className="p-4 text-center">
-                <TrendingUp className="h-8 w-8 text-blue-600 mx-auto mb-2" />
-                <h3 className="font-semibold">Invest in Impact</h3>
-                <p className="text-sm text-gray-600">Fund regenerative ventures</p>
+              <CardContent className="p-3 sm:p-4 text-center">
+                <TrendingUp className="h-6 w-6 sm:h-8 sm:w-8 text-blue-600 mx-auto mb-2" />
+                <h3 className="font-semibold text-sm sm:text-base">Invest in Impact</h3>
+                <p className="text-xs sm:text-sm text-gray-600">Fund regenerative ventures</p>
               </CardContent>
             </Card>
           </Link>
 
           <Link to="/knowledge">
             <Card className="hover:shadow-md transition-shadow cursor-pointer bg-white/70 backdrop-blur-sm border-white/20">
-              <CardContent className="p-4 text-center">
-                <Network className="h-8 w-8 text-purple-600 mx-auto mb-2" />
-                <h3 className="font-semibold">Share Knowledge</h3>
-                <p className="text-sm text-gray-600">Contribute to collective wisdom</p>
+              <CardContent className="p-3 sm:p-4 text-center">
+                <Network className="h-6 w-6 sm:h-8 sm:w-8 text-purple-600 mx-auto mb-2" />
+                <h3 className="font-semibold text-sm sm:text-base">Share Knowledge</h3>
+                <p className="text-xs sm:text-sm text-gray-600">Contribute to collective wisdom</p>
               </CardContent>
             </Card>
           </Link>
 
           <Link to="/governance">
             <Card className="hover:shadow-md transition-shadow cursor-pointer bg-white/70 backdrop-blur-sm border-white/20">
-              <CardContent className="p-4 text-center">
-                <Shield className="h-8 w-8 text-orange-600 mx-auto mb-2" />
-                <h3 className="font-semibold">Participate in Governance</h3>
-                <p className="text-sm text-gray-600">Shape the future together</p>
+              <CardContent className="p-3 sm:p-4 text-center">
+                <Shield className="h-6 w-6 sm:h-8 sm:w-8 text-orange-600 mx-auto mb-2" />
+                <h3 className="font-semibold text-sm sm:text-base">Participate in Governance</h3>
+                <p className="text-xs sm:text-sm text-gray-600">Shape the future together</p>
               </CardContent>
             </Card>
           </Link>
         </div>
 
         {/* System Status */}
-        <div className="mt-8">
+        <div className="mt-6 sm:mt-8">
           <Card className="bg-white/70 backdrop-blur-sm border-white/20">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Activity className="h-5 w-5" />
+              <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                <Activity className="h-4 w-4 sm:h-5 sm:w-5" />
                 Ecosystem Health Status
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
                 <div>
                   <p className="text-sm text-gray-600 mb-1">Environmental Impact</p>
                   <Progress value={94} className="mb-1" />

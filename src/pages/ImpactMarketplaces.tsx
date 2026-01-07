@@ -160,53 +160,53 @@ export default function ImpactMarketplaces() {
   }
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
-      <div className="flex items-center gap-3 mb-6">
-        <TrendingUp className="h-8 w-8 text-green-600" />
-        <h1 className="text-3xl font-bold">Impact Marketplaces</h1>
+    <div className="md:ml-80 p-4 sm:p-6 space-y-4 sm:space-y-6">
+      <div className="flex items-center gap-3 mb-4 sm:mb-6">
+        <TrendingUp className="h-6 w-6 sm:h-8 sm:w-8 text-green-600" />
+        <h1 className="text-2xl sm:text-3xl font-bold">Impact Marketplaces</h1>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-4 sm:mb-6">
         <Card>
-          <CardContent className="p-4">
+          <CardContent className="p-3 sm:p-4">
             <div className="flex items-center gap-2">
-              <Target className="h-5 w-5 text-blue-600" />
+              <Target className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600" />
               <div>
-                <p className="text-sm text-gray-600">Verified Ventures</p>
-                <p className="text-2xl font-bold">{ventures.length}</p>
+                <p className="text-xs sm:text-sm text-gray-600">Verified Ventures</p>
+                <p className="text-xl sm:text-2xl font-bold">{ventures.length}</p>
               </div>
             </div>
           </CardContent>
         </Card>
         <Card>
-          <CardContent className="p-4">
+          <CardContent className="p-3 sm:p-4">
             <div className="flex items-center gap-2">
-              <DollarSign className="h-5 w-5 text-green-600" />
+              <DollarSign className="h-4 w-4 sm:h-5 sm:w-5 text-green-600" />
               <div>
-                <p className="text-sm text-gray-600">Market Value</p>
-                <p className="text-2xl font-bold">${(getTotalMarketValue() / 1000000).toFixed(1)}M</p>
+                <p className="text-xs sm:text-sm text-gray-600">Market Value</p>
+                <p className="text-xl sm:text-2xl font-bold">${(getTotalMarketValue() / 1000000).toFixed(1)}M</p>
               </div>
             </div>
           </CardContent>
         </Card>
         <Card>
-          <CardContent className="p-4">
+          <CardContent className="p-3 sm:p-4">
             <div className="flex items-center gap-2">
-              <BarChart3 className="h-5 w-5 text-purple-600" />
+              <BarChart3 className="h-4 w-4 sm:h-5 sm:w-5 text-purple-600" />
               <div>
-                <p className="text-sm text-gray-600">Total Invested</p>
-                <p className="text-2xl font-bold">${(getTotalInvestments() / 1000000).toFixed(1)}M</p>
+                <p className="text-xs sm:text-sm text-gray-600">Total Invested</p>
+                <p className="text-xl sm:text-2xl font-bold">${(getTotalInvestments() / 1000000).toFixed(1)}M</p>
               </div>
             </div>
           </CardContent>
         </Card>
         <Card>
-          <CardContent className="p-4">
+          <CardContent className="p-3 sm:p-4">
             <div className="flex items-center gap-2">
-              <TrendingUp className="h-5 w-5 text-orange-600" />
+              <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5 text-orange-600" />
               <div>
-                <p className="text-sm text-gray-600">Avg Expected Return</p>
-                <p className="text-2xl font-bold">{getAverageReturn().toFixed(1)}%</p>
+                <p className="text-xs sm:text-sm text-gray-600">Avg Expected Return</p>
+                <p className="text-xl sm:text-2xl font-bold">{getAverageReturn().toFixed(1)}%</p>
               </div>
             </div>
           </CardContent>
@@ -214,63 +214,61 @@ export default function ImpactMarketplaces() {
       </div>
 
       <Tabs defaultValue="ventures" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="ventures">Ventures</TabsTrigger>
-          <TabsTrigger value="opportunities">Investment Opportunities</TabsTrigger>
-          <TabsTrigger value="ratings">Impact Ratings</TabsTrigger>
-          <TabsTrigger value="secondary">Secondary Market</TabsTrigger>
-          <TabsTrigger value="portfolio">My Portfolio</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 lg:grid-cols-5">
+          <TabsTrigger value="ventures" className="text-xs sm:text-sm">Ventures</TabsTrigger>
+          <TabsTrigger value="opportunities" className="text-xs sm:text-sm">Opportunities</TabsTrigger>
+          <TabsTrigger value="ratings" className="text-xs sm:text-sm">Ratings</TabsTrigger>
+          <TabsTrigger value="secondary" className="text-xs sm:text-sm">Secondary</TabsTrigger>
+          <TabsTrigger value="portfolio" className="text-xs sm:text-sm">Portfolio</TabsTrigger>
         </TabsList>
 
         <TabsContent value="ventures" className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
             {ventures.map((venture) => (
               <Card key={venture.id}>
-                <CardHeader>
+                <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">
-                    <CardTitle className="flex items-center gap-2">
+                    <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
                       {getVentureTypeIcon(venture.venture_type)}
-                      {venture.venture_name}
+                      <span className="truncate">{venture.venture_name}</span>
                     </CardTitle>
-                    <Badge className={getStatusColor(venture.verification_status)}>
+                    <Badge className={getStatusColor(venture.verification_status)} size="sm">
                       {venture.verification_status}
                     </Badge>
                   </div>
                 </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    <div>
-                      <p className="text-sm text-gray-600">Sector</p>
-                      <p className="font-semibold capitalize">{venture.sector.replace('_', ' ')}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-600">Stage</p>
-                      <p className="font-semibold capitalize">{venture.stage}</p>
-                    </div>
-                    <div className="grid grid-cols-2 gap-2 text-sm">
-                      <div>
-                        <p className="text-gray-600">Funding Goal</p>
-                        <p className="font-semibold">${venture.funding_goal.toLocaleString()}</p>
-                      </div>
-                      <div>
-                        <p className="text-gray-600">Min Investment</p>
-                        <p className="font-semibold">${venture.minimum_investment.toLocaleString()}</p>
-                      </div>
-                    </div>
-                    <div>
-                      <div className="flex justify-between text-sm mb-1">
-                        <span>Funding Progress</span>
-                        <span>{getFundingProgress(venture).toFixed(1)}%</span>
-                      </div>
-                      <Progress value={getFundingProgress(venture)} />
-                      <p className="text-xs text-gray-500 mt-1">
-                        ${venture.funding_raised.toLocaleString()} raised
-                      </p>
-                    </div>
-                    <Button className="w-full" size="sm">
-                      View Details
-                    </Button>
+                <CardContent className="space-y-3">
+                  <div>
+                    <p className="text-xs sm:text-sm text-gray-600">Sector</p>
+                    <p className="font-semibold text-sm capitalize">{venture.sector.replace('_', ' ')}</p>
                   </div>
+                  <div>
+                    <p className="text-xs sm:text-sm text-gray-600">Stage</p>
+                    <p className="font-semibold text-sm capitalize">{venture.stage}</p>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2 text-sm">
+                    <div>
+                      <p className="text-gray-600 text-xs">Funding Goal</p>
+                      <p className="font-semibold">${venture.funding_goal.toLocaleString()}</p>
+                    </div>
+                    <div>
+                      <p className="text-gray-600 text-xs">Min Investment</p>
+                      <p className="font-semibold">${venture.minimum_investment.toLocaleString()}</p>
+                    </div>
+                  </div>
+                  <div>
+                    <div className="flex justify-between text-sm mb-1">
+                      <span>Funding Progress</span>
+                      <span>{getFundingProgress(venture).toFixed(1)}%</span>
+                    </div>
+                    <Progress value={getFundingProgress(venture)} />
+                    <p className="text-xs text-gray-500 mt-1">
+                      ${venture.funding_raised.toLocaleString()} raised
+                    </p>
+                  </div>
+                  <Button className="w-full" size="sm">
+                    View Details
+                  </Button>
                 </CardContent>
               </Card>
             ))}
@@ -280,37 +278,37 @@ export default function ImpactMarketplaces() {
         <TabsContent value="opportunities" className="space-y-4">
           {opportunities.map((opportunity) => (
             <Card key={opportunity.id}>
-              <CardHeader>
+              <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
-                  <CardTitle className="flex items-center gap-2">
-                    <DollarSign className="h-5 w-5" />
-                    {opportunity.opportunity_type.replace('_', ' ')} Investment
+                  <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                    <DollarSign className="h-4 w-4 sm:h-5 sm:w-5" />
+                    <span className="truncate">{opportunity.opportunity_type.replace('_', ' ')} Investment</span>
                   </CardTitle>
-                  <Badge className={getStatusColor(opportunity.status)}>
+                  <Badge className={getStatusColor(opportunity.status)} size="sm">
                     {opportunity.status.replace('_', ' ')}
                   </Badge>
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-4">
                   <div>
-                    <p className="text-sm text-gray-600">Target Amount</p>
-                    <p className="text-lg font-semibold">${opportunity.target_amount.toLocaleString()}</p>
+                    <p className="text-xs sm:text-sm text-gray-600">Target Amount</p>
+                    <p className="text-base sm:text-lg font-semibold">${opportunity.target_amount.toLocaleString()}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-600">Raised</p>
-                    <p className="text-lg font-semibold">${opportunity.raised_amount.toLocaleString()}</p>
+                    <p className="text-xs sm:text-sm text-gray-600">Raised</p>
+                    <p className="text-base sm:text-lg font-semibold">${opportunity.raised_amount.toLocaleString()}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-600">Expected Return</p>
-                    <p className="text-lg font-semibold">{opportunity.expected_return?.toFixed(1) || 'N/A'}%</p>
+                    <p className="text-xs sm:text-sm text-gray-600">Expected Return</p>
+                    <p className="text-base sm:text-lg font-semibold">{opportunity.expected_return?.toFixed(1) || 'N/A'}%</p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-600">Investment Period</p>
-                    <p className="text-lg font-semibold">{opportunity.investment_period_months} months</p>
+                    <p className="text-xs sm:text-sm text-gray-600">Investment Period</p>
+                    <p className="text-base sm:text-lg font-semibold">{opportunity.investment_period_months} months</p>
                   </div>
                 </div>
-                <div className="mt-4">
+                <div className="mb-4">
                   <div className="flex justify-between text-sm mb-1">
                     <span>Funding Progress</span>
                     <span>{((opportunity.raised_amount / opportunity.target_amount) * 100).toFixed(1)}%</span>
@@ -320,14 +318,15 @@ export default function ImpactMarketplaces() {
                     {opportunity.investor_count} investors • Closes {new Date(opportunity.closing_date).toLocaleDateString()}
                   </p>
                 </div>
-                <div className="mt-4 flex gap-2">
+                <div className="flex flex-col sm:flex-row gap-2">
                   <Button 
                     onClick={() => investInOpportunity(opportunity.id, 10000)}
                     className="flex-1"
+                    size="sm"
                   >
                     Invest Now
                   </Button>
-                  <Button variant="outline" className="flex-1">
+                  <Button variant="outline" className="flex-1" size="sm">
                     Learn More
                   </Button>
                 </div>
