@@ -36,6 +36,12 @@ import BlueEconomy from "./pages/BlueEconomy";
 import HumanHealth from "./pages/HumanHealth";
 import CircularBioeconomy from "./pages/CircularBioeconomy";
 import ImpactMarketplaces from "./pages/ImpactMarketplaces";
+// New User Flow Components
+import ComprehensiveOnboarding from "./pages/ComprehensiveOnboarding";
+import ProjectRegistrationFlow from "./pages/ProjectRegistrationFlow";
+import InvestmentFlow from "./pages/InvestmentFlow";
+import PractitionerDashboardFlow from "./pages/PractitionerDashboardFlow";
+import InvestorDashboardFlow from "./pages/InvestorDashboardFlow";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -47,40 +53,49 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
-          <EcosystemNavigation />
           <Routes>
+            {/* Landing & Auth Routes (No Sidebar) */}
             <Route path="/" element={<EnhancedIndex />} />
             <Route path="/auth" element={<Auth />} />
-            <Route path="/onboarding" element={<Onboarding />} />
-            <Route path="/dashboard" element={<Dashboard />} />
+            
+            {/* User Flow Routes (With Integrated Sidebar) */}
+            <Route path="/onboarding" element={<ComprehensiveOnboarding />} />
+            <Route path="/register-project-flow" element={<ProjectRegistrationFlow />} />
+            <Route path="/investment-flow" element={<InvestmentFlow />} />
+            <Route path="/practitioner-flow" element={<PractitionerDashboardFlow />} />
+            <Route path="/investor-flow" element={<InvestorDashboardFlow />} />
+            
+            {/* Main Application Routes (With Sidebar via Layout) */}
+            <Route path="/dashboard" element={<><EcosystemNavigation /><div className="md:ml-80"><Dashboard /></div></>} />
             <Route path="/ecosystem" element={<EcosystemDashboard />} />
-            <Route path="/how-it-works" element={<HowItWorks />} />
-            <Route path="/project/:id" element={<ProjectDetail />} />
-            <Route path="/admin" element={<AdminPanel />} />
-            <Route path="/business-model" element={<BusinessModel />} />
-            <Route path="/pricing" element={<SubscriptionPlans />} />
-            <Route path="/enterprise" element={<StakeholderSelector />} />
-            <Route path="/practitioner" element={<PractitionerDashboard />} />
-            <Route path="/investor" element={<InvestorDashboard />} />
-            <Route path="/government" element={<GovernmentDashboard />} />
-            <Route path="/builder" element={<BuilderDashboard />} />
-            <Route path="/register-project" element={<ProjectRegistration />} />
-            <Route path="/verify-projects" element={<ProjectVerification />} />
-            <Route path="/monitoring" element={<RealTimeMonitoring />} />
-            <Route path="/governance" element={<EthicalGovernance />} />
-            <Route path="/contracts" element={<SmartContractIssuance />} />
-            <Route path="/marketplace" element={<ValueExchangeInvestment />} />
-            <Route path="/impact" element={<ContinuousImpactMeasurement />} />
-            <Route path="/purpose" element={<PurposeGovernedDesign />} />
-            <Route path="/exchange" element={<RegenerativeValueExchange />} />
-            <Route path="/intelligence" element={<RealityLinkedIntelligence />} />
-            <Route path="/knowledge" element={<StoriesToSystems />} />
+            <Route path="/how-it-works" element={<><EcosystemNavigation /><div className="md:ml-80"><HowItWorks /></div></>} />
+            <Route path="/project/:id" element={<><EcosystemNavigation /><div className="md:ml-80"><ProjectDetail /></div></>} />
+            <Route path="/admin" element={<><EcosystemNavigation /><div className="md:ml-80"><AdminPanel /></div></>} />
+            <Route path="/business-model" element={<><EcosystemNavigation /><div className="md:ml-80"><BusinessModel /></div></>} />
+            <Route path="/pricing" element={<><EcosystemNavigation /><div className="md:ml-80"><SubscriptionPlans /></div></>} />
+            <Route path="/enterprise" element={<><EcosystemNavigation /><div className="md:ml-80"><StakeholderSelector /></div></>} />
+            <Route path="/practitioner" element={<><EcosystemNavigation /><div className="md:ml-80"><PractitionerDashboard /></div></>} />
+            <Route path="/investor" element={<><EcosystemNavigation /><div className="md:ml-80"><InvestorDashboard /></div></>} />
+            <Route path="/government" element={<><EcosystemNavigation /><div className="md:ml-80"><GovernmentDashboard /></div></>} />
+            <Route path="/builder" element={<><EcosystemNavigation /><div className="md:ml-80"><BuilderDashboard /></div></>} />
+            <Route path="/register-project" element={<><EcosystemNavigation /><div className="md:ml-80"><ProjectRegistration /></div></>} />
+            <Route path="/verify-projects" element={<><EcosystemNavigation /><div className="md:ml-80"><ProjectVerification /></div></>} />
+            <Route path="/monitoring" element={<><EcosystemNavigation /><div className="md:ml-80"><RealTimeMonitoring /></div></>} />
+            <Route path="/governance" element={<><EcosystemNavigation /><div className="md:ml-80"><EthicalGovernance /></div></>} />
+            <Route path="/contracts" element={<><EcosystemNavigation /><div className="md:ml-80"><SmartContractIssuance /></div></>} />
+            <Route path="/marketplace" element={<><EcosystemNavigation /><div className="md:ml-80"><ValueExchangeInvestment /></div></>} />
+            <Route path="/impact" element={<><EcosystemNavigation /><div className="md:ml-80"><ContinuousImpactMeasurement /></div></>} />
+            <Route path="/purpose" element={<><EcosystemNavigation /><div className="md:ml-80"><PurposeGovernedDesign /></div></>} />
+            <Route path="/exchange" element={<><EcosystemNavigation /><div className="md:ml-80"><RegenerativeValueExchange /></div></>} />
+            <Route path="/intelligence" element={<><EcosystemNavigation /><div className="md:ml-80"><RealityLinkedIntelligence /></div></>} />
+            <Route path="/knowledge" element={<><EcosystemNavigation /><div className="md:ml-80"><StoriesToSystems /></div></>} />
             <Route path="/agriculture" element={<RegenerativeAgriculture />} />
-            <Route path="/ocean" element={<BlueEconomy />} />
-            <Route path="/health" element={<HumanHealth />} />
-            <Route path="/circular" element={<CircularBioeconomy />} />
+            <Route path="/ocean" element={<><EcosystemNavigation /><div className="md:ml-80"><BlueEconomy /></div></>} />
+            <Route path="/health" element={<><EcosystemNavigation /><div className="md:ml-80"><HumanHealth /></div></>} />
+            <Route path="/circular" element={<><EcosystemNavigation /><div className="md:ml-80"><CircularBioeconomy /></div></>} />
             <Route path="/invest" element={<ImpactMarketplaces />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            
+            {/* Catch-all route */}
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

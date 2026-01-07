@@ -96,7 +96,7 @@ export default function EnhancedIndex() {
                   <span className="sm:hidden">Explore</span>
                 </Button>
               </Link>
-              <Link to="/auth">
+              <Link to="/onboarding">
                 <Button size="sm" className="text-xs sm:text-sm">
                   <span className="hidden sm:inline">Get Started</span>
                   <span className="sm:hidden">Start</span>
@@ -135,7 +135,7 @@ export default function EnhancedIndex() {
                 <ArrowRight className="h-4 w-4 sm:h-5 sm:w-5 ml-2" />
               </Button>
             </Link>
-            <Link to="/invest">
+            <Link to="/investment-flow">
               <Button size="lg" variant="outline" className="w-full sm:w-auto">
                 <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
                 <span className="text-sm sm:text-base">Start Investing</span>
@@ -252,13 +252,13 @@ export default function EnhancedIndex() {
               there's a place for you in our regenerative ecosystem.
             </p>
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
-              <Link to="/register-project">
+              <Link to="/register-project-flow">
                 <Button size="lg" variant="secondary" className="w-full sm:w-auto">
                   <Target className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
                   <span className="text-sm sm:text-base">Register Your Project</span>
                 </Button>
               </Link>
-              <Link to="/invest">
+              <Link to="/investment-flow">
                 <Button size="lg" variant="outline" className="w-full sm:w-auto border-white text-white hover:bg-white hover:text-gray-900">
                   <DollarSign className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
                   <span className="text-sm sm:text-base">Start Investing</span>
@@ -305,10 +305,10 @@ export default function EnhancedIndex() {
             <div>
               <h3 className="font-semibold mb-3 sm:mb-4 text-sm sm:text-base">Get Started</h3>
               <div className="space-y-2 text-sm text-gray-400">
-                <Link to="/register-project" className="block hover:text-white transition-colors">Register Project</Link>
+                <Link to="/register-project-flow" className="block hover:text-white transition-colors">Register Project</Link>
                 <Link to="/how-it-works" className="block hover:text-white transition-colors">How It Works</Link>
                 <Link to="/pricing" className="block hover:text-white transition-colors">Pricing</Link>
-                <Link to="/auth" className="block hover:text-white transition-colors">Sign Up</Link>
+                <Link to="/onboarding" className="block hover:text-white transition-colors">Sign Up</Link>
               </div>
             </div>
           </div>
