@@ -1,0 +1,10 @@
+{
+  "scripts": {
+    "build:prod": "vite build --mode production",
+    "preview:prod": "vite preview --port 3000",
+    "analyze": "vite-bundle-analyzer dist",
+    "type-check": "tsc --noEmit",
+    "lint:fix": "eslint . --ext ts,tsx --fix",
+    "test:build": "npm run type-check && npm run build:prod"
+  }
+}
