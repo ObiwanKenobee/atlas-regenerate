@@ -1,58 +1,22 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { supabase } from "@/integrations/supabase/client";
 import { DollarSign, TrendingUp, Recycle, Leaf, Target, Zap } from "lucide-react";
 import { PieChart, Pie, Cell, ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, BarChart, Bar } from "recharts";
 
-interface RevenueStream {
-  id: string;
-  stream_name: string;
-  stream_type: string;
-  revenue_model: string;
-  rate: number;
-  description: string;
-  is_active: boolean;
-}
-
-interface CircularMetric {
-  id: string;
-  metric_type: string;
-  baseline_value: number;
-  current_value: number;
-  target_value: number;
-  unit: string;
-  circular_score: number;
-}
+// Mock data for revenue streams
+const mockRevenueStreams = [
+  { id: '1', stream_name: 'Transaction Fees', stream_type: 'transaction_fee', revenue_model: 'percentage', rate: 2.5, description: 'Fee on all value exchanges', is_active: true },
+  { id: '2', stream_name: 'Premium Subscriptions', stream_type: 'subscription', revenue_model: 'flat_rate', rate: 99, description: 'Monthly access to advanced features', is_active: true },
+  { id: '3', stream_name: 'Carbon Credit Sales', stream_type: 'carbon_credits', revenue_model: 'percentage', rate: 5, description: 'Commission on carbon credit trades', is_active: true },
+  { id: '4', stream_name: 'Impact Bonds', stream_type: 'impact_bonds', revenue_model: 'percentage', rate: 1.5, description: 'Fee on impact bond issuance', is_active: true },
+];
 
 const BusinessModel = () => {
-  const [revenueStreams, setRevenueStreams] = useState<RevenueStream[]>([]);
-  const [circularMetrics, setCircularMetrics] = useState<CircularMetric[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [revenueStreams] = useState(mockRevenueStreams);
 
-  useEffect(() => {
-    fetchBusinessData();
-  }, []);
-
-  const fetchBusinessData = async () => {
-    try {
-      const [revenueRes, metricsRes] = await Promise.all([
-        supabase.from("revenue_streams").select("*").eq("is_active", true),
-        supabase.from("circular_metrics").select("*")
-      ]);
-
-      if (revenueRes.data) setRevenueStreams(revenueRes.data);
-      if (metricsRes.data) setCircularMetrics(metricsRes.data);
-    } catch (error) {
-      console.error("Error fetching business data:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Mock data for visualization
   const revenueData = [
     { name: "Transaction Fees", value: 45, amount: 125000 },
     { name: "Subscriptions", value: 25, amount: 75000 },
@@ -70,10 +34,10 @@ const BusinessModel = () => {
   ];
 
   const sustainabilityMetrics = [
-    { name: "Carbon Negative", value: 95, color: "#2d9b6e" },
-    { name: "Waste Circular", value: 88, color: "#3b8fa3" },
-    { name: "Resource Efficient", value: 92, color: "#b8860b" },
-    { name: "Social Impact", value: 85, color: "#2a7a94" }
+    { name: "Carbon Negative", value: 95, color: "hsl(var(--primary))" },
+    { name: "Waste Circular", value: 88, color: "hsl(var(--accent))" },
+    { name: "Resource Efficient", value: 92, color: "hsl(var(--secondary))" },
+    { name: "Social Impact", value: 85, color: "hsl(var(--muted))" }
   ];
 
   const getStreamIcon = (type: string) => {
@@ -86,16 +50,8 @@ const BusinessModel = () => {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-hero-gradient flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
-      </div>
-    );
-  }
-
   return (
-    <div className="min-h-screen bg-hero-gradient p-6">
+    <div className="min-h-screen bg-background p-6">
       <div className="container mx-auto max-w-7xl">
         <div className="mb-8">
           <h1 className="font-serif text-4xl mb-2">Circular Business Model</h1>
@@ -112,7 +68,6 @@ const BusinessModel = () => {
             <TabsTrigger value="performance">Performance</TabsTrigger>
           </TabsList>
 
-          {/* Revenue Streams */}
           <TabsContent value="revenue" className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {revenueStreams.map((stream) => {
@@ -192,18 +147,18 @@ const BusinessModel = () => {
                     <AreaChart data={circularityData}>
                       <defs>
                         <linearGradient id="revenue" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="#2d9b6e" stopOpacity={0.3}/>
-                          <stop offset="95%" stopColor="#2d9b6e" stopOpacity={0}/>
+                          <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3}/>
+                          <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/>
                         </linearGradient>
                       </defs>
-                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(160 20% 15%)" />
-                      <XAxis dataKey="month" stroke="hsl(45 10% 55%)" />
-                      <YAxis stroke="hsl(45 10% 55%)" />
+                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--muted))" />
+                      <XAxis dataKey="month" stroke="hsl(var(--muted-foreground))" />
+                      <YAxis stroke="hsl(var(--muted-foreground))" />
                       <Tooltip />
                       <Area
                         type="monotone"
                         dataKey="efficiency"
-                        stroke="#2d9b6e"
+                        stroke="hsl(var(--primary))"
                         fillOpacity={1}
                         fill="url(#revenue)"
                       />
@@ -214,7 +169,6 @@ const BusinessModel = () => {
             </div>
           </TabsContent>
 
-          {/* Circular Economy */}
           <TabsContent value="circular" className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <Card className="glass">
@@ -281,39 +235,33 @@ const BusinessModel = () => {
                   <AreaChart data={circularityData}>
                     <defs>
                       <linearGradient id="efficiency" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#2d9b6e" stopOpacity={0.3}/>
-                        <stop offset="95%" stopColor="#2d9b6e" stopOpacity={0}/>
+                        <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3}/>
+                        <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/>
                       </linearGradient>
                       <linearGradient id="regeneration" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#3b8fa3" stopOpacity={0.3}/>
-                        <stop offset="95%" stopColor="#3b8fa3" stopOpacity={0}/>
-                      </linearGradient>
-                      <linearGradient id="waste" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#b8860b" stopOpacity={0.3}/>
-                        <stop offset="95%" stopColor="#b8860b" stopOpacity={0}/>
+                        <stop offset="5%" stopColor="hsl(var(--accent))" stopOpacity={0.3}/>
+                        <stop offset="95%" stopColor="hsl(var(--accent))" stopOpacity={0}/>
                       </linearGradient>
                     </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(160 20% 15%)" />
-                    <XAxis dataKey="month" stroke="hsl(45 10% 55%)" />
-                    <YAxis stroke="hsl(45 10% 55%)" />
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--muted))" />
+                    <XAxis dataKey="month" stroke="hsl(var(--muted-foreground))" />
+                    <YAxis stroke="hsl(var(--muted-foreground))" />
                     <Tooltip />
-                    <Area type="monotone" dataKey="efficiency" stackId="1" stroke="#2d9b6e" fill="url(#efficiency)" />
-                    <Area type="monotone" dataKey="regeneration" stackId="2" stroke="#3b8fa3" fill="url(#regeneration)" />
-                    <Area type="monotone" dataKey="waste_reduction" stackId="3" stroke="#b8860b" fill="url(#waste)" />
+                    <Area type="monotone" dataKey="efficiency" stackId="1" stroke="hsl(var(--primary))" fill="url(#efficiency)" />
+                    <Area type="monotone" dataKey="regeneration" stackId="2" stroke="hsl(var(--accent))" fill="url(#regeneration)" />
                   </AreaChart>
                 </ResponsiveContainer>
               </CardContent>
             </Card>
           </TabsContent>
 
-          {/* Sustainability */}
           <TabsContent value="sustainability" className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {sustainabilityMetrics.map((metric) => (
                 <Card key={metric.name} className="glass">
                   <CardContent className="p-6">
                     <div className="text-center space-y-4">
-                      <div className="text-3xl font-bold" style={{ color: metric.color }}>
+                      <div className="text-3xl font-bold text-primary">
                         {metric.value}%
                       </div>
                       <div className="text-sm font-medium">{metric.name}</div>
@@ -337,11 +285,11 @@ const BusinessModel = () => {
                     </div>
                     <div className="grid grid-cols-2 gap-4 text-center">
                       <div>
-                        <div className="text-2xl font-bold text-forest">1,250</div>
+                        <div className="text-2xl font-bold text-primary">1,250</div>
                         <div className="text-xs text-muted-foreground">Credits Generated</div>
                       </div>
                       <div>
-                        <div className="text-2xl font-bold text-ocean">$31,250</div>
+                        <div className="text-2xl font-bold text-primary">$31,250</div>
                         <div className="text-xs text-muted-foreground">Credit Value</div>
                       </div>
                     </div>
@@ -360,11 +308,11 @@ const BusinessModel = () => {
                       { name: "Indirect", value: 250 },
                       { name: "Induced", value: 180 }
                     ]}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(160 20% 15%)" />
-                      <XAxis dataKey="name" stroke="hsl(45 10% 55%)" />
-                      <YAxis stroke="hsl(45 10% 55%)" />
+                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--muted))" />
+                      <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" />
+                      <YAxis stroke="hsl(var(--muted-foreground))" />
                       <Tooltip />
-                      <Bar dataKey="value" fill="#2d9b6e" radius={[4, 4, 0, 0]} />
+                      <Bar dataKey="value" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
                     </BarChart>
                   </ResponsiveContainer>
                 </CardContent>
@@ -372,7 +320,6 @@ const BusinessModel = () => {
             </div>
           </TabsContent>
 
-          {/* Performance */}
           <TabsContent value="performance" className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <Card className="glass">
@@ -418,54 +365,20 @@ const BusinessModel = () => {
               </CardHeader>
               <CardContent>
                 <div className="space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                      <h4 className="font-medium mb-3">Revenue Diversification</h4>
-                      <div className="space-y-2">
-                        <div className="flex justify-between">
-                          <span className="text-sm">Transaction Fees</span>
-                          <span className="text-sm font-medium">45%</span>
-                        </div>
-                        <Progress value={45} className="h-2" />
-                        <div className="flex justify-between">
-                          <span className="text-sm">Subscriptions</span>
-                          <span className="text-sm font-medium">25%</span>
-                        </div>
-                        <Progress value={25} className="h-2" />
-                        <div className="flex justify-between">
-                          <span className="text-sm">Carbon Credits</span>
-                          <span className="text-sm font-medium">20%</span>
-                        </div>
-                        <Progress value={20} className="h-2" />
-                        <div className="flex justify-between">
-                          <span className="text-sm">Impact Bonds</span>
-                          <span className="text-sm font-medium">10%</span>
-                        </div>
-                        <Progress value={10} className="h-2" />
+                  {[
+                    { metric: "Revenue Growth", value: 85 },
+                    { metric: "Customer Retention", value: 92 },
+                    { metric: "Market Penetration", value: 45 },
+                    { metric: "Operational Efficiency", value: 78 }
+                  ].map((item) => (
+                    <div key={item.metric} className="space-y-2">
+                      <div className="flex justify-between text-sm">
+                        <span>{item.metric}</span>
+                        <span className="font-medium">{item.value}%</span>
                       </div>
+                      <Progress value={item.value} className="h-2" />
                     </div>
-                    <div>
-                      <h4 className="font-medium mb-3">Circular Economy Principles</h4>
-                      <div className="space-y-3">
-                        <div className="flex items-center gap-3">
-                          <div className="w-2 h-2 rounded-full bg-primary"></div>
-                          <span className="text-sm">Waste elimination through digital platform</span>
-                        </div>
-                        <div className="flex items-center gap-3">
-                          <div className="w-2 h-2 rounded-full bg-primary"></div>
-                          <span className="text-sm">Resource circulation via impact reinvestment</span>
-                        </div>
-                        <div className="flex items-center gap-3">
-                          <div className="w-2 h-2 rounded-full bg-primary"></div>
-                          <span className="text-sm">Regenerative outcomes drive revenue</span>
-                        </div>
-                        <div className="flex items-center gap-3">
-                          <div className="w-2 h-2 rounded-full bg-primary"></div>
-                          <span className="text-sm">Self-sustaining ecosystem growth</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+                  ))}
                 </div>
               </CardContent>
             </Card>
