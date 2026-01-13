@@ -94,7 +94,7 @@ const App = () => (
               <Route path="/how-it-works" element={<><EcosystemNavigation /><div className="md:ml-80"><HowItWorks /></div></>} />
               <Route path="/admin" element={<><EcosystemNavigation /><div className="md:ml-80"><AdminPanel /></div></>} />
               <Route path="/business-model" element={<><EcosystemNavigation /><div className="md:ml-80"><BusinessModel /></div></>} />
-              <Route path="/pricing" element={<><EcosystemNavigation /><div className="md:ml-80"><SubscriptionPlans /></div></>} />
+              <Route path="/pricing" element={<><EcosystemNavigation /><div className="md:ml-80"><Pricing /></div></>} />
               <Route path="/enterprise" element={<><EcosystemNavigation /><div className="md:ml-80"><StakeholderSelector /></div></>} />
               <Route path="/practitioner" element={<><EcosystemNavigation /><div className="md:ml-80"><PractitionerDashboard /></div></>} />
               <Route path="/investor" element={<><EcosystemNavigation /><div className="md:ml-80"><InvestorDashboard /></div></>} />
