@@ -4,7 +4,6 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
-import { supabase } from "@/integrations/supabase/client";
 import { Satellite, Cpu, Volume2, Droplets, TrendingUp, AlertTriangle, CheckCircle, Clock } from "lucide-react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area, BarChart, Bar } from "recharts";
 import { motion } from "framer-motion";
@@ -39,6 +38,26 @@ interface SatelliteObservation {
   cloud_coverage: number;
 }
 
+// Mock data
+const mockMonitoringData: MonitoringData[] = [
+  { id: "1", measurement_type: "soil_moisture", measurement_value: 34.5, measurement_unit: "%", confidence_score: 0.95, recorded_at: "2024-01-26T10:30:00Z", oracle_name: "Soil Sensor Alpha", oracle_type: "iot_sensor" },
+  { id: "2", measurement_type: "ndvi", measurement_value: 0.75, measurement_unit: "index", confidence_score: 0.96, recorded_at: "2024-01-26T08:00:00Z", oracle_name: "Sentinel-2", oracle_type: "satellite" },
+  { id: "3", measurement_type: "acoustic_index", measurement_value: 8.2, measurement_unit: "score", confidence_score: 0.89, recorded_at: "2024-01-26T06:00:00Z", oracle_name: "Biodiversity Monitor", oracle_type: "acoustic" },
+  { id: "4", measurement_type: "water_quality", measurement_value: 7.2, measurement_unit: "pH", confidence_score: 0.92, recorded_at: "2024-01-26T12:00:00Z", oracle_name: "Water Sensor Beta", oracle_type: "water_quality" },
+];
+
+const mockVerificationEvents: VerificationEvent[] = [
+  { id: "1", event_type: "vegetation_improvement", severity: "success", ai_analysis: "NDVI increase of 8% detected over 30-day period", verification_status: "verified", created_at: "2024-01-26T10:00:00Z" },
+  { id: "2", event_type: "soil_health_alert", severity: "warning", ai_analysis: "Soil moisture below optimal range in sector 4", verification_status: "pending", created_at: "2024-01-25T14:00:00Z" },
+  { id: "3", event_type: "biodiversity_milestone", severity: "success", ai_analysis: "3 new bird species detected in monitoring zone", verification_status: "verified", created_at: "2024-01-24T09:00:00Z" },
+];
+
+const mockSatelliteData: SatelliteObservation[] = [
+  { id: "1", image_date: "2024-01-24", ndvi_mean: 0.75, ndvi_change: 0.08, vegetation_health: "excellent", analysis_confidence: 0.96, cloud_coverage: 15.5 },
+  { id: "2", image_date: "2024-01-19", ndvi_mean: 0.72, ndvi_change: 0.05, vegetation_health: "good", analysis_confidence: 0.94, cloud_coverage: 12.3 },
+  { id: "3", image_date: "2024-01-14", ndvi_mean: 0.70, ndvi_change: 0.03, vegetation_health: "good", analysis_confidence: 0.92, cloud_coverage: 18.7 },
+];
+
 const RealTimeMonitoring = () => {
   const [monitoringData, setMonitoringData] = useState<MonitoringData[]>([]);
   const [verificationEvents, setVerificationEvents] = useState<VerificationEvent[]>([]);
@@ -47,48 +66,16 @@ const RealTimeMonitoring = () => {
 
   useEffect(() => {
     fetchMonitoringData();
-    // Set up real-time subscriptions
-    const interval = setInterval(fetchMonitoringData, 30000); // Update every 30 seconds
+    const interval = setInterval(fetchMonitoringData, 30000);
     return () => clearInterval(interval);
   }, []);
 
   const fetchMonitoringData = async () => {
     try {
-      // Fetch latest monitoring data
-      const { data: monitoring } = await supabase
-        .from("monitoring_data")
-        .select(`
-          *,
-          monitoring_oracles(oracle_name, oracle_type)
-        `)
-        .order("recorded_at", { ascending: false })
-        .limit(100);
-
-      // Fetch verification events
-      const { data: events } = await supabase
-        .from("verification_events")
-        .select("*")
-        .order("created_at", { ascending: false })
-        .limit(20);
-
-      // Fetch satellite observations
-      const { data: satellite } = await supabase
-        .from("satellite_observations")
-        .select("*")
-        .order("image_date", { ascending: false })
-        .limit(30);
-
-      if (monitoring) {
-        const formattedData = monitoring.map(item => ({
-          ...item,
-          oracle_name: item.monitoring_oracles?.oracle_name || "Unknown",
-          oracle_type: item.monitoring_oracles?.oracle_type || "unknown"
-        }));
-        setMonitoringData(formattedData);
-      }
-
-      setVerificationEvents(events || []);
-      setSatelliteData(satellite || []);
+      // Use mock data instead of database queries
+      setMonitoringData(mockMonitoringData);
+      setVerificationEvents(mockVerificationEvents);
+      setSatelliteData(mockSatelliteData);
     } catch (error) {
       console.error("Error fetching monitoring data:", error);
     } finally {
@@ -96,7 +83,6 @@ const RealTimeMonitoring = () => {
     }
   };
 
-  // Mock real-time data for visualization
   const ndviTrend = [
     { date: "Jan 1", ndvi: 0.65, confidence: 0.92 },
     { date: "Jan 6", ndvi: 0.68, confidence: 0.94 },
@@ -404,25 +390,33 @@ const RealTimeMonitoring = () => {
                     <div className="text-center p-4 bg-muted/20 rounded-lg">
                       <p className="text-3xl font-bold text-primary">18</p>
                       <p className="text-sm text-muted-foreground">Species Detected This Month</p>
-                      <Badge variant="outline" className="mt-2">+3 from last month</Badge>
                     </div>
-                    <div className="space-y-3">
-                      {[
-                        { species: "Songbirds", count: 8, confidence: 0.94 },
-                        { species: "Insects", count: 6, confidence: 0.87 },
-                        { species: "Amphibians", count: 3, confidence: 0.91 },
-                        { species: "Small Mammals", count: 1, confidence: 0.78 }
-                      ].map((item, index) => (
-                        <div key={index} className="flex justify-between items-center p-2 bg-muted/10 rounded">
-                          <span className="text-sm">{item.species}</span>
-                          <div className="flex items-center gap-2">
-                            <span className="font-medium">{item.count}</span>
-                            <Badge variant="outline" className="text-xs">
-                              {Math.round(item.confidence * 100)}%
-                            </Badge>
-                          </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="p-3 bg-green-50 rounded-lg">
+                        <p className="text-lg font-bold text-green-700">+5</p>
+                        <p className="text-xs text-green-600">New Species</p>
+                      </div>
+                      <div className="p-3 bg-blue-50 rounded-lg">
+                        <p className="text-lg font-bold text-blue-700">9.1</p>
+                        <p className="text-xs text-blue-600">Acoustic Index</p>
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <p className="text-sm font-medium">Recent Detections:</p>
+                      <div className="space-y-1">
+                        <div className="flex justify-between text-sm">
+                          <span>Red-winged Blackbird</span>
+                          <Badge variant="outline">Bird</Badge>
                         </div>
-                      ))}
+                        <div className="flex justify-between text-sm">
+                          <span>American Bullfrog</span>
+                          <Badge variant="outline">Amphibian</Badge>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span>Monarch Butterfly</span>
+                          <Badge variant="outline">Insect</Badge>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </CardContent>
@@ -432,44 +426,16 @@ const RealTimeMonitoring = () => {
 
           {/* AI Verification */}
           <TabsContent value="verification" className="space-y-6">
-            <div className="grid grid-cols-1 gap-6">
-              <Card className="glass">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <Card className="glass lg:col-span-2">
                 <CardHeader>
-                  <CardTitle>AI Verification Events</CardTitle>
-                  <p className="text-sm text-muted-foreground">Automated analysis and anomaly detection</p>
+                  <CardTitle>Verification Events</CardTitle>
+                  <p className="text-sm text-muted-foreground">AI-powered analysis of ecological changes</p>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    {[
-                      {
-                        type: "improvement_detected",
-                        severity: "success",
-                        message: "Vegetation health improvement confirmed by satellite analysis",
-                        confidence: 0.96,
-                        time: "2 hours ago"
-                      },
-                      {
-                        type: "milestone_reached",
-                        severity: "success",
-                        message: "Soil moisture levels have stabilized within optimal range",
-                        confidence: 0.92,
-                        time: "6 hours ago"
-                      },
-                      {
-                        type: "anomaly_detected",
-                        severity: "warning",
-                        message: "Unusual temperature spike detected in sector 3",
-                        confidence: 0.84,
-                        time: "1 day ago"
-                      }
-                    ].map((event, index) => (
-                      <motion.div
-                        key={index}
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: index * 0.1 }}
-                        className={`p-4 rounded-lg ${getSeverityColor(event.severity)}`}
-                      >
+                    {verificationEvents.map((event) => (
+                      <div key={event.id} className={`p-4 rounded-lg ${getSeverityColor(event.severity)}`}>
                         <div className="flex items-start justify-between">
                           <div className="flex items-start gap-3">
                             {event.severity === "success" ? (
@@ -480,45 +446,52 @@ const RealTimeMonitoring = () => {
                               <Clock className="w-5 h-5 mt-0.5" />
                             )}
                             <div>
-                              <p className="font-medium">{event.message}</p>
-                              <p className="text-sm opacity-75 mt-1">
-                                AI Confidence: {Math.round(event.confidence * 100)}% • {event.time}
-                              </p>
+                              <p className="font-medium capitalize">{event.event_type.replace(/_/g, " ")}</p>
+                              <p className="text-sm mt-1">{event.ai_analysis}</p>
                             </div>
                           </div>
-                          <Badge variant="outline" className="capitalize">
-                            {event.type.replace("_", " ")}
-                          </Badge>
+                          <Badge variant="outline">{event.verification_status}</Badge>
                         </div>
-                      </motion.div>
+                      </div>
                     ))}
                   </div>
                 </CardContent>
               </Card>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <Card className="glass">
-                  <CardContent className="p-6 text-center">
-                    <div className="text-3xl font-bold text-primary mb-2">94.2%</div>
-                    <div className="text-sm text-muted-foreground">Average AI Confidence</div>
-                    <Badge variant="default" className="mt-2">High Accuracy</Badge>
-                  </CardContent>
-                </Card>
-                <Card className="glass">
-                  <CardContent className="p-6 text-center">
-                    <div className="text-3xl font-bold text-primary mb-2">24/7</div>
-                    <div className="text-sm text-muted-foreground">Continuous Monitoring</div>
-                    <Badge variant="outline" className="mt-2">Real-time</Badge>
-                  </CardContent>
-                </Card>
-                <Card className="glass">
-                  <CardContent className="p-6 text-center">
-                    <div className="text-3xl font-bold text-primary mb-2">15</div>
-                    <div className="text-sm text-muted-foreground">Verified Improvements</div>
-                    <Badge variant="default" className="mt-2">This Month</Badge>
-                  </CardContent>
-                </Card>
-              </div>
+              <Card className="glass">
+                <CardHeader>
+                  <CardTitle>Verification Stats</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="text-center p-4 bg-muted/20 rounded-lg">
+                      <p className="text-3xl font-bold text-primary">94%</p>
+                      <p className="text-sm text-muted-foreground">Verification Rate</p>
+                    </div>
+                    <div className="space-y-3">
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm">Verified Claims</span>
+                        <span className="font-medium">47</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm">Pending Review</span>
+                        <span className="font-medium">3</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm">Rejected</span>
+                        <span className="font-medium">0</span>
+                      </div>
+                    </div>
+                    <div className="pt-2">
+                      <div className="flex justify-between text-sm mb-2">
+                        <span>AI Confidence</span>
+                        <span>94%</span>
+                      </div>
+                      <Progress value={94} className="h-2" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
           </TabsContent>
         </Tabs>
