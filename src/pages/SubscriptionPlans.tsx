@@ -3,7 +3,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Check, Crown, Zap, Star } from "lucide-react";
 import { motion } from "framer-motion";
@@ -31,6 +30,43 @@ interface UserSubscription {
   subscription_tiers: SubscriptionTier;
 }
 
+// Mock data for subscription tiers
+const mockTiers: SubscriptionTier[] = [
+  {
+    id: "tier-basic",
+    tier_name: "Basic",
+    monthly_price: 0,
+    annual_price: 0,
+    features: ["project_registration", "basic_metrics", "community_access"],
+    max_projects: 3,
+    analytics_access: false,
+    priority_support: false,
+    is_active: true
+  },
+  {
+    id: "tier-pro",
+    tier_name: "Pro",
+    monthly_price: 49,
+    annual_price: 470,
+    features: ["unlimited_projects", "advanced_analytics", "priority_verification", "api_access", "carbon_marketplace"],
+    max_projects: -1,
+    analytics_access: true,
+    priority_support: true,
+    is_active: true
+  },
+  {
+    id: "tier-enterprise",
+    tier_name: "Enterprise",
+    monthly_price: 199,
+    annual_price: 1990,
+    features: ["white_label", "dedicated_support", "custom_integrations", "bulk_verification", "institutional_reporting", "multi_org_management"],
+    max_projects: -1,
+    analytics_access: true,
+    priority_support: true,
+    is_active: true
+  }
+];
+
 const SubscriptionPlans = () => {
   const { user } = useAuth();
   const [tiers, setTiers] = useState<SubscriptionTier[]>([]);
@@ -44,30 +80,20 @@ const SubscriptionPlans = () => {
 
   const fetchSubscriptionData = async () => {
     try {
-      // Fetch subscription tiers
-      const { data: tiersData, error: tiersError } = await supabase
-        .from("subscription_tiers")
-        .select("*")
-        .eq("is_active", true)
-        .order("monthly_price", { ascending: true });
-
-      if (tiersError) throw tiersError;
-      setTiers(tiersData || []);
-
-      // Fetch user's current subscription
+      // Use mock data instead of database queries
+      setTiers(mockTiers);
+      
+      // Simulate a basic subscription for logged-in users
       if (user) {
-        const { data: subData, error: subError } = await supabase
-          .from("user_subscriptions")
-          .select(`
-            *,
-            subscription_tiers (*)
-          `)
-          .eq("user_id", user.id)
-          .eq("is_active", true)
-          .single();
-
-        if (subError && subError.code !== 'PGRST116') throw subError;
-        setCurrentSubscription(subData);
+        setCurrentSubscription({
+          id: "sub-1",
+          tier_id: "tier-basic",
+          start_date: "2024-01-01",
+          end_date: "2025-01-01",
+          is_active: true,
+          payment_status: "active",
+          subscription_tiers: mockTiers[0]
+        });
       }
     } catch (error) {
       console.error("Error fetching subscription data:", error);
@@ -84,29 +110,23 @@ const SubscriptionPlans = () => {
 
     setUpgrading(true);
     try {
-      // Deactivate current subscription if exists
-      if (currentSubscription) {
-        await supabase
-          .from("user_subscriptions")
-          .update({ is_active: false, end_date: new Date().toISOString().split('T')[0] })
-          .eq("id", currentSubscription.id);
-      }
-
-      // Create new subscription
-      const { error } = await supabase
-        .from("user_subscriptions")
-        .insert({
-          user_id: user.id,
+      // Simulate subscription update
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      const selectedTier = tiers.find(t => t.id === tierId);
+      if (selectedTier) {
+        setCurrentSubscription({
+          id: "sub-new",
           tier_id: tierId,
           start_date: new Date().toISOString().split('T')[0],
+          end_date: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
           is_active: true,
-          payment_status: "active"
+          payment_status: "active",
+          subscription_tiers: selectedTier
         });
-
-      if (error) throw error;
+      }
 
       toast.success(`Successfully subscribed to ${tierName}!`);
-      fetchSubscriptionData();
     } catch (error) {
       console.error("Error subscribing:", error);
       toast.error("Failed to subscribe. Please try again.");
