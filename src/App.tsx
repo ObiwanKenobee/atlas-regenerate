@@ -50,6 +50,7 @@ import APIMarketplace from "./pages/APIMarketplace";
 import SystemMonitoring from "./pages/SystemMonitoring";
 import NewsletterAdmin from "./pages/NewsletterAdmin";
 import NotFound from "./pages/NotFound";
+import ProjectSubmitForm from "./components/ProjectSubmitForm";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -76,6 +77,7 @@ const App = () => (
               
               {/* User Flow Routes */}
               <Route path="/onboarding" element={<ComprehensiveOnboarding />} />
+              <Route path="/project/new" element={<ProjectSubmitForm />} />
               <Route path="/register-project-flow" element={<ProjectRegistrationFlow />} />
               <Route path="/investment-flow" element={<InvestmentFlow />} />
               <Route path="/practitioner-flow" element={<PractitionerDashboardFlow />} />

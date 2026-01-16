@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
+import { useProjects } from "@/hooks/useProjects";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -9,7 +10,7 @@ import { Progress } from "@/components/ui/progress";
 import { motion } from "framer-motion";
 import {
   Leaf, Waves, Heart, RefreshCw, Zap, TrendingUp,
-  LogOut, Menu, X, BarChart3, Globe, Users, MapPin, Target, Settings, DollarSign
+  LogOut, Menu, X, BarChart3, Globe, Users, MapPin, Target, DollarSign, Plus
 } from "lucide-react";
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip,
@@ -24,21 +25,11 @@ interface ImpactMetric {
   category: string;
 }
 
-// Mock projects data
-const mockProjects = [
-  { id: '1', title: 'Amazon Reforestation', description: 'Restoring 10,000 hectares of degraded rainforest', location: 'Brazil', funding_goal: 2500000, funding_raised: 1875000, project_type: 'forestry', status: 'active', image_url: '' },
-  { id: '2', title: 'Coral Reef Restoration', description: 'Protecting and restoring coral ecosystems', location: 'Great Barrier Reef', funding_goal: 1800000, funding_raised: 1260000, project_type: 'marine', status: 'active', image_url: '' },
-  { id: '3', title: 'Regenerative Farm Network', description: 'Building soil health across 50 farms', location: 'California', funding_goal: 950000, funding_raised: 712500, project_type: 'agriculture', status: 'active', image_url: '' },
-  { id: '4', title: 'Mangrove Conservation', description: 'Protecting coastal mangrove ecosystems', location: 'Indonesia', funding_goal: 1200000, funding_raised: 960000, project_type: 'marine', status: 'active', image_url: '' },
-  { id: '5', title: 'Urban Green Spaces', description: 'Creating sustainable urban gardens', location: 'Singapore', funding_goal: 650000, funding_raised: 390000, project_type: 'agriculture', status: 'active', image_url: '' },
-  { id: '6', title: 'Savanna Restoration', description: 'Restoring grassland ecosystems', location: 'Kenya', funding_goal: 1500000, funding_raised: 900000, project_type: 'forestry', status: 'active', image_url: '' },
-];
-
 const Dashboard = () => {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
+  const { projects, loading: projectsLoading, fetchProjects } = useProjects();
   const [metrics, setMetrics] = useState<ImpactMetric[]>([]);
-  const [projects] = useState(mockProjects);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -119,7 +110,14 @@ const Dashboard = () => {
     }
   };
 
-  if (loading) {
+  const getLocationDisplay = (location: any) => {
+    if (!location) return "Location TBD";
+    if (typeof location === "string") return location;
+    if (location.country) return `${location.region || ""} ${location.country}`.trim();
+    return "Location TBD";
+  };
+
+  if (loading || projectsLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin" />
@@ -142,10 +140,10 @@ const Dashboard = () => {
           </div>
 
           <nav className="flex-1 p-4 space-y-2">
-            <a href="/dashboard" className="flex items-center gap-3 px-4 py-3 rounded-lg bg-primary/10 text-primary"><BarChart3 className="w-5 h-5" />Dashboard</a>
-            <a href="/business-model" className="flex items-center gap-3 px-4 py-3 rounded-lg text-muted-foreground hover:bg-muted transition-colors"><TrendingUp className="w-5 h-5" />Business Model</a>
-            <a href="/pricing" className="flex items-center gap-3 px-4 py-3 rounded-lg text-muted-foreground hover:bg-muted transition-colors"><DollarSign className="w-5 h-5" />Pricing</a>
-            <a href="/how-it-works" className="flex items-center gap-3 px-4 py-3 rounded-lg text-muted-foreground hover:bg-muted transition-colors"><Globe className="w-5 h-5" />How It Works</a>
+            <Link to="/dashboard" className="flex items-center gap-3 px-4 py-3 rounded-lg bg-primary/10 text-primary"><BarChart3 className="w-5 h-5" />Dashboard</Link>
+            <Link to="/project/new" className="flex items-center gap-3 px-4 py-3 rounded-lg text-muted-foreground hover:bg-muted transition-colors"><Plus className="w-5 h-5" />New Project</Link>
+            <Link to="/pricing" className="flex items-center gap-3 px-4 py-3 rounded-lg text-muted-foreground hover:bg-muted transition-colors"><DollarSign className="w-5 h-5" />Pricing</Link>
+            <Link to="/how-it-works" className="flex items-center gap-3 px-4 py-3 rounded-lg text-muted-foreground hover:bg-muted transition-colors"><Globe className="w-5 h-5" />How It Works</Link>
           </nav>
 
           <div className="p-4 border-t border-border">
@@ -198,36 +196,57 @@ const Dashboard = () => {
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="mb-8">
             <div className="flex items-center justify-between mb-6">
               <h2 className="font-serif text-2xl">Active Projects</h2>
-              <Button variant="outline" size="sm">View All</Button>
+              <div className="flex gap-2">
+                <Button variant="outline" size="sm" asChild>
+                  <Link to="/project/new"><Plus className="w-4 h-4 mr-1" />New Project</Link>
+                </Button>
+              </div>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {projects.map((project) => {
-                const Icon = getProjectIcon(project.project_type);
-                const fundingProgress = (project.funding_raised / project.funding_goal) * 100;
-                return (
-                  <Card key={project.id} className="glass hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate(`/project/${project.id}`)}>
-                    <CardHeader className="pb-3">
-                      <div className="flex items-start gap-3">
-                        <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0"><Icon className="w-5 h-5 text-primary" /></div>
-                        <div className="flex-1 min-w-0">
-                          <CardTitle className="text-lg line-clamp-1">{project.title}</CardTitle>
-                          <div className="flex items-center gap-1 text-sm text-muted-foreground mt-1"><MapPin className="w-3 h-3" /><span className="truncate">{project.location}</span></div>
+            {projects.length === 0 ? (
+              <Card className="glass">
+                <CardContent className="py-12 text-center">
+                  <div className="w-16 h-16 mx-auto rounded-full bg-primary/10 flex items-center justify-center mb-4">
+                    <Leaf className="w-8 h-8 text-primary" />
+                  </div>
+                  <h3 className="font-serif text-xl mb-2">No Projects Yet</h3>
+                  <p className="text-muted-foreground mb-6">Create your first regenerative project to get started</p>
+                  <Button variant="hero" asChild>
+                    <Link to="/project/new">Create Your First Project</Link>
+                  </Button>
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {projects.map((project) => {
+                  const Icon = getProjectIcon(project.project_type);
+                  const fundingProgress = project.funding_goal && project.funding_goal > 0 
+                    ? ((project.funding_raised || 0) / project.funding_goal) * 100 
+                    : 0;
+                  return (
+                    <Card key={project.id} className="glass hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate(`/project/${project.id}`)}>
+                      <CardHeader className="pb-3">
+                        <div className="flex items-start gap-3">
+                          <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0"><Icon className="w-5 h-5 text-primary" /></div>
+                          <div className="flex-1 min-w-0">
+                            <CardTitle className="text-lg line-clamp-1">{project.project_name}</CardTitle>
+                            <div className="flex items-center gap-1 text-sm text-muted-foreground mt-1"><MapPin className="w-3 h-3" /><span className="truncate">{getLocationDisplay(project.location)}</span></div>
+                          </div>
+                          <Badge variant="outline" className="capitalize">{project.project_type}</Badge>
                         </div>
-                        <Badge variant="outline" className="capitalize">{project.project_type}</Badge>
-                      </div>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-sm text-muted-foreground mb-4 line-clamp-2">{project.description}</p>
-                      <div className="space-y-2">
-                        <div className="flex justify-between text-sm"><span>Funding Progress</span><span>{fundingProgress.toFixed(1)}%</span></div>
-                        <Progress value={fundingProgress} className="h-2" />
-                        <div className="flex justify-between text-sm text-muted-foreground"><span>${project.funding_raised.toLocaleString()}</span><span>${project.funding_goal.toLocaleString()}</span></div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                );
-              })}
-            </div>
+                      </CardHeader>
+                      <CardContent>
+                        <p className="text-sm text-muted-foreground mb-4 line-clamp-2">{project.description || "No description provided"}</p>
+                        <div className="space-y-2">
+                          <div className="flex justify-between text-sm"><span>Funding Progress</span><span>{fundingProgress.toFixed(1)}%</span></div>
+                          <Progress value={fundingProgress} className="h-2" />
+                          <div className="flex justify-between text-sm text-muted-foreground"><span>${(project.funding_raised || 0).toLocaleString()}</span><span>${(project.funding_goal || 0).toLocaleString()}</span></div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
+              </div>
+            )}
           </motion.div>
 
           {/* Charts Row */}
