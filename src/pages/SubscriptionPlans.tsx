@@ -1,106 +1,20 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useAuth } from "@/hooks/useAuth";
+import { useSubscriptionTiers, useUserSubscription } from "@/hooks/useProjects";
+import { supabase } from "@/integrations/supabase/client";
 import { Check, Crown, Zap, Star } from "lucide-react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 
-interface SubscriptionTier {
-  id: string;
-  tier_name: string;
-  monthly_price: number;
-  annual_price: number;
-  features: string[];
-  max_projects: number;
-  analytics_access: boolean;
-  priority_support: boolean;
-  is_active: boolean;
-}
-
-interface UserSubscription {
-  id: string;
-  tier_id: string;
-  start_date: string;
-  end_date: string;
-  is_active: boolean;
-  payment_status: string;
-  subscription_tiers: SubscriptionTier;
-}
-
-// Mock data for subscription tiers
-const mockTiers: SubscriptionTier[] = [
-  {
-    id: "tier-basic",
-    tier_name: "Basic",
-    monthly_price: 0,
-    annual_price: 0,
-    features: ["project_registration", "basic_metrics", "community_access"],
-    max_projects: 3,
-    analytics_access: false,
-    priority_support: false,
-    is_active: true
-  },
-  {
-    id: "tier-pro",
-    tier_name: "Pro",
-    monthly_price: 49,
-    annual_price: 470,
-    features: ["unlimited_projects", "advanced_analytics", "priority_verification", "api_access", "carbon_marketplace"],
-    max_projects: -1,
-    analytics_access: true,
-    priority_support: true,
-    is_active: true
-  },
-  {
-    id: "tier-enterprise",
-    tier_name: "Enterprise",
-    monthly_price: 199,
-    annual_price: 1990,
-    features: ["white_label", "dedicated_support", "custom_integrations", "bulk_verification", "institutional_reporting", "multi_org_management"],
-    max_projects: -1,
-    analytics_access: true,
-    priority_support: true,
-    is_active: true
-  }
-];
-
 const SubscriptionPlans = () => {
   const { user } = useAuth();
-  const [tiers, setTiers] = useState<SubscriptionTier[]>([]);
-  const [currentSubscription, setCurrentSubscription] = useState<UserSubscription | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { tiers, loading: tiersLoading } = useSubscriptionTiers();
+  const { subscription, loading: subLoading } = useUserSubscription();
   const [upgrading, setUpgrading] = useState(false);
-
-  useEffect(() => {
-    fetchSubscriptionData();
-  }, [user]);
-
-  const fetchSubscriptionData = async () => {
-    try {
-      // Use mock data instead of database queries
-      setTiers(mockTiers);
-      
-      // Simulate a basic subscription for logged-in users
-      if (user) {
-        setCurrentSubscription({
-          id: "sub-1",
-          tier_id: "tier-basic",
-          start_date: "2024-01-01",
-          end_date: "2025-01-01",
-          is_active: true,
-          payment_status: "active",
-          subscription_tiers: mockTiers[0]
-        });
-      }
-    } catch (error) {
-      console.error("Error fetching subscription data:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleSubscribe = async (tierId: string, tierName: string) => {
     if (!user) {
@@ -110,23 +24,26 @@ const SubscriptionPlans = () => {
 
     setUpgrading(true);
     try {
-      // Simulate subscription update
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      const selectedTier = tiers.find(t => t.id === tierId);
-      if (selectedTier) {
-        setCurrentSubscription({
-          id: "sub-new",
+      const startDate = new Date().toISOString().split('T')[0];
+      const endDate = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+
+      const { error } = await supabase
+        .from("user_subscriptions")
+        .upsert({
+          user_id: user.id,
           tier_id: tierId,
-          start_date: new Date().toISOString().split('T')[0],
-          end_date: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+          start_date: startDate,
+          end_date: endDate,
           is_active: true,
           payment_status: "active",
-          subscription_tiers: selectedTier
+        }, {
+          onConflict: "user_id",
         });
-      }
+
+      if (error) throw error;
 
       toast.success(`Successfully subscribed to ${tierName}!`);
+      window.location.reload();
     } catch (error) {
       console.error("Error subscribing:", error);
       toast.error("Failed to subscribe. Please try again.");
@@ -153,13 +70,17 @@ const SubscriptionPlans = () => {
     }
   };
 
-  if (loading) {
+  if (tiersLoading || subLoading) {
     return (
       <div className="min-h-screen bg-hero-gradient flex items-center justify-center">
         <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
       </div>
     );
   }
+
+  const currentTier = subscription?.tier_id 
+    ? tiers.find(t => t.id === subscription.tier_id) 
+    : null;
 
   return (
     <div className="min-h-screen bg-hero-gradient p-6">
@@ -169,9 +90,9 @@ const SubscriptionPlans = () => {
           <p className="text-muted-foreground text-lg">
             Scale your regenerative impact with the right tools and features
           </p>
-          {currentSubscription && (
+          {currentTier && (
             <Badge variant="outline" className="mt-4">
-              Current Plan: {currentSubscription.subscription_tiers.tier_name}
+              Current Plan: {currentTier.tier_name}
             </Badge>
           )}
         </div>
@@ -179,7 +100,7 @@ const SubscriptionPlans = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {tiers.map((tier, index) => {
             const Icon = getTierIcon(tier.tier_name);
-            const isCurrentPlan = currentSubscription?.tier_id === tier.id;
+            const isCurrentPlan = subscription?.tier_id === tier.id;
             const isPro = tier.tier_name.toLowerCase() === "pro";
             
             return (
@@ -219,7 +140,7 @@ const SubscriptionPlans = () => {
                   
                   <CardContent className="space-y-6">
                     <div className="space-y-3">
-                      {tier.features.map((feature, idx) => (
+                      {(tier.features || []).map((feature, idx) => (
                         <div key={idx} className="flex items-center gap-3">
                           <Check className="w-5 h-5 text-primary flex-shrink-0" />
                           <span className="text-sm capitalize">{feature.replace(/_/g, " ")}</span>
@@ -229,7 +150,7 @@ const SubscriptionPlans = () => {
                       <div className="flex items-center gap-3">
                         <Check className="w-5 h-5 text-primary flex-shrink-0" />
                         <span className="text-sm">
-                          {tier.max_projects === -1 ? "Unlimited projects" : `Up to ${tier.max_projects} projects`}
+                          {tier.max_projects === -1 || tier.max_projects === null ? "Unlimited projects" : `Up to ${tier.max_projects} projects`}
                         </span>
                       </div>
                       
@@ -270,7 +191,7 @@ const SubscriptionPlans = () => {
                           <div className="bg-muted/20 p-4 rounded-lg">
                             <h4 className="font-medium mb-2">What you'll get:</h4>
                             <ul className="space-y-1 text-sm">
-                              {tier.features.map((feature, idx) => (
+                              {(tier.features || []).map((feature, idx) => (
                                 <li key={idx} className="flex items-center gap-2">
                                   <Check className="w-4 h-4 text-primary" />
                                   <span className="capitalize">{feature.replace(/_/g, " ")}</span>
