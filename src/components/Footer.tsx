@@ -1,4 +1,5 @@
 import { Leaf, Twitter, Linkedin, Github, Mail } from "lucide-react";
+import MobileAppDownload from "./MobileAppDownload";
 
 const Footer = () => {
   const footerLinks = {
@@ -67,6 +68,15 @@ const Footer = () => {
               </ul>
             </div>
           ))}
+        </div>
+
+        {/* Mobile App Download Section */}
+        <div className="pt-12">
+          <MobileAppDownload
+            title="Get Our Mobile App"
+            description="Experience Atlas Sanctum on your mobile device"
+            className="max-w-md mx-auto"
+          />
         </div>
 
         {/* Bottom Bar */}
