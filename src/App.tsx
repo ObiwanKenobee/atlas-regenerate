@@ -49,6 +49,8 @@ import CarbonMarketplace from "./pages/CarbonMarketplace";
 import APIMarketplace from "./pages/APIMarketplace";
 import SystemMonitoring from "./pages/SystemMonitoring";
 import NewsletterAdmin from "./pages/NewsletterAdmin";
+import RegenerativeSystemsDashboard from "./pages/RegenerativeSystemsDashboard";
+import CivilizationalArchitecture from "./pages/CivilizationalArchitecture";
 import NotFound from "./pages/NotFound";
 import ProjectSubmitForm from "./components/ProjectSubmitForm";
 
@@ -89,6 +91,8 @@ const App = () => (
               <Route path="/api-marketplace" element={<APIMarketplace />} />
               <Route path="/system-monitoring" element={<SystemMonitoring />} />
               <Route path="/newsletter-admin" element={<NewsletterAdmin />} />
+              <Route path="/regenerative-systems" element={<RegenerativeSystemsDashboard />} />
+              <Route path="/civilizational-architecture" element={<CivilizationalArchitecture />} />
               
               {/* Main Application Routes */}
               <Route path="/dashboard" element={<><EcosystemNavigation /><div className="md:ml-80"><Dashboard /></div></>} />
