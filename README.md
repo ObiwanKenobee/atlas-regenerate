@@ -59,6 +59,59 @@ This project is built with:
 - React
 - shadcn-ui
 - Tailwind CSS
+- Supabase (for backend services)
+- Framer Motion (for animations)
+
+## Mobile App Download Component
+
+The project includes a `MobileAppDownload` component that provides:
+
+- Responsive design with app store badges
+- QR code scanning functionality
+- Analytics tracking for downloads
+- Accessibility features (ARIA attributes, keyboard navigation)
+- No-JS fallback support
+- Integration with Supabase for download tracking
+
+### Usage
+
+```tsx
+import MobileAppDownload from "@/components/MobileAppDownload";
+
+<MobileAppDownload
+  title="Download Our Mobile App"
+  description="Experience Atlas Sanctum on the go..."
+  iosAppUrl="https://apps.apple.com/app/atlas-sanctum"
+  androidAppUrl="https://play.google.com/store/apps/details?id=com.atlassanctum"
+  qrCodeUrl="/qr-code.png"
+/>
+```
+
+### Props
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `className` | string | "" | Additional CSS classes |
+| `title` | string | "Download Our Mobile App" | Section title |
+| `description` | string | Default description | Section description |
+| `iosAppUrl` | string | Apple App Store URL | iOS app download link |
+| `androidAppUrl` | string | Google Play URL | Android app download link |
+| `qrCodeUrl` | string | "/qr-code.png" | QR code image source |
+
+## Database Schema
+
+The component uses two Supabase tables:
+
+### `app_downloads`
+- `id`: UUID (primary key)
+- `user_id`: UUID (references auth.users)
+- `platform`: string ("ios" or "android")
+- `timestamp`: timestamp
+
+### `app_metrics`
+- `id`: UUID (primary key)
+- `download_count`: integer
+- `last_updated`: timestamp
 
 ## How can I deploy this project?
 

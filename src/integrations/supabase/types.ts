@@ -244,6 +244,30 @@ export type Database = {
         }
         Relationships: []
       }
+      app_downloads: {
+        Row: {
+          id: string
+          user_id: string | null
+          platform: string
+          timestamp: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id?: string | null
+          platform: string
+          timestamp?: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string | null
+          platform?: string
+          timestamp?: string
+          created_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
