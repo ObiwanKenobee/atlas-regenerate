@@ -390,7 +390,7 @@ export default function InvestmentFlow() {
                   <Checkbox 
                     id="accredited"
                     checked={investmentData.accredited}
-                    onCheckedChange={(checked) => setInvestmentData({...investmentData, accredited: checked === true})}
+                    onCheckedChange={(checked) => setInvestmentData({...investmentData, accredited: checked})}
                   />
                   <Label htmlFor="accredited" className="text-sm">
                     I confirm that I am an accredited investor
@@ -401,7 +401,7 @@ export default function InvestmentFlow() {
                   <Checkbox 
                     id="kyc"
                     checked={investmentData.kycCompleted}
-                    onCheckedChange={(checked) => setInvestmentData({...investmentData, kycCompleted: checked === true})}
+                    onCheckedChange={(checked) => setInvestmentData({...investmentData, kycCompleted: checked})}
                   />
                   <Label htmlFor="kyc" className="text-sm">
                     I have completed the KYC verification process

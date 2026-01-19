@@ -44,47 +44,50 @@ export type Database = {
         }
         Relationships: []
       }
-      organizations: {
+      investments: {
         Row: {
-          contact_info: Json | null
+          amount: number
           created_at: string
-          description: string | null
           id: string
-          location: Json | null
-          logo_url: string | null
-          name: string
-          organization_type: string
-          updated_at: string
-          verification_status: string | null
-          website_url: string | null
+          investment_type: string | null
+          project_id: string | null
+          status: string | null
+          user_id: string | null
         }
         Insert: {
-          contact_info?: Json | null
+          amount: number
           created_at?: string
-          description?: string | null
           id?: string
-          location?: Json | null
-          logo_url?: string | null
-          name: string
-          organization_type?: string
-          updated_at?: string
-          verification_status?: string | null
-          website_url?: string | null
+          investment_type?: string | null
+          project_id?: string | null
+          status?: string | null
+          user_id?: string | null
         }
         Update: {
-          contact_info?: Json | null
+          amount?: number
           created_at?: string
-          description?: string | null
           id?: string
-          location?: Json | null
-          logo_url?: string | null
-          name?: string
-          organization_type?: string
-          updated_at?: string
-          verification_status?: string | null
-          website_url?: string | null
+          investment_type?: string | null
+          project_id?: string | null
+          status?: string | null
+          user_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "investments_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "investments_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
       }
       profiles: {
         Row: {
@@ -93,6 +96,7 @@ export type Database = {
           created_at: string
           full_name: string | null
           id: string
+          is_admin: boolean | null
           onboarding_completed: boolean | null
           organization: string | null
           role: string | null
@@ -105,6 +109,7 @@ export type Database = {
           created_at?: string
           full_name?: string | null
           id?: string
+          is_admin?: boolean | null
           onboarding_completed?: boolean | null
           organization?: string | null
           role?: string | null
@@ -117,6 +122,7 @@ export type Database = {
           created_at?: string
           full_name?: string | null
           id?: string
+          is_admin?: boolean | null
           onboarding_completed?: boolean | null
           organization?: string | null
           role?: string | null
@@ -125,203 +131,94 @@ export type Database = {
         }
         Relationships: []
       }
-      project_investments: {
+      project_metrics: {
         Row: {
-          amount: number
+          category: string | null
           created_at: string
           id: string
-          investment_type: string | null
-          investor_id: string
-          project_id: string
-          status: string | null
-          transaction_date: string | null
+          metric_name: string
+          metric_unit: string | null
+          metric_value: number | null
+          project_id: string | null
+          recorded_at: string
         }
         Insert: {
-          amount: number
+          category?: string | null
           created_at?: string
           id?: string
-          investment_type?: string | null
-          investor_id: string
-          project_id: string
-          status?: string | null
-          transaction_date?: string | null
+          metric_name: string
+          metric_unit?: string | null
+          metric_value?: number | null
+          project_id?: string | null
+          recorded_at?: string
         }
         Update: {
-          amount?: number
+          category?: string | null
           created_at?: string
           id?: string
-          investment_type?: string | null
-          investor_id?: string
-          project_id?: string
-          status?: string | null
-          transaction_date?: string | null
+          metric_name?: string
+          metric_unit?: string | null
+          metric_value?: number | null
+          project_id?: string | null
+          recorded_at?: string
         }
         Relationships: [
           {
-            foreignKeyName: "project_investments_project_id_fkey"
+            foreignKeyName: "project_metrics_project_id_fkey"
             columns: ["project_id"]
             isOneToOne: false
             referencedRelation: "projects"
             referencedColumns: ["id"]
-          },
+          }
         ]
       }
       projects: {
         Row: {
-          biodiversity_score: number | null
-          carbon_sequestered: number | null
           created_at: string
           description: string | null
-          end_date: string | null
           funding_goal: number | null
           funding_raised: number | null
           id: string
-          impact_metrics: Json | null
-          location: Json | null
-          organization_id: string | null
-          owner_id: string
-          project_name: string
-          project_type: string
-          start_date: string | null
+          image_url: string | null
+          latitude: number | null
+          location: string | null
+          longitude: number | null
+          project_type: string | null
           status: string | null
-          total_area_hectares: number | null
+          title: string
           updated_at: string
-          verification_status: string | null
         }
         Insert: {
-          biodiversity_score?: number | null
-          carbon_sequestered?: number | null
           created_at?: string
           description?: string | null
-          end_date?: string | null
           funding_goal?: number | null
           funding_raised?: number | null
           id?: string
-          impact_metrics?: Json | null
-          location?: Json | null
-          organization_id?: string | null
-          owner_id: string
-          project_name: string
-          project_type?: string
-          start_date?: string | null
+          image_url?: string | null
+          latitude?: number | null
+          location?: string | null
+          longitude?: number | null
+          project_type?: string | null
           status?: string | null
-          total_area_hectares?: number | null
+          title: string
           updated_at?: string
-          verification_status?: string | null
         }
         Update: {
-          biodiversity_score?: number | null
-          carbon_sequestered?: number | null
           created_at?: string
           description?: string | null
-          end_date?: string | null
           funding_goal?: number | null
           funding_raised?: number | null
           id?: string
-          impact_metrics?: Json | null
-          location?: Json | null
-          organization_id?: string | null
-          owner_id?: string
-          project_name?: string
-          project_type?: string
-          start_date?: string | null
+          image_url?: string | null
+          latitude?: number | null
+          location?: string | null
+          longitude?: number | null
+          project_type?: string | null
           status?: string | null
-          total_area_hectares?: number | null
+          title?: string
           updated_at?: string
-          verification_status?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "projects_organization_id_fkey"
-            columns: ["organization_id"]
-            isOneToOne: false
-            referencedRelation: "organizations"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      subscription_tiers: {
-        Row: {
-          analytics_access: boolean | null
-          annual_price: number
-          created_at: string
-          features: string[] | null
-          id: string
-          is_active: boolean | null
-          max_projects: number | null
-          monthly_price: number
-          priority_support: boolean | null
-          tier_name: string
-        }
-        Insert: {
-          analytics_access?: boolean | null
-          annual_price?: number
-          created_at?: string
-          features?: string[] | null
-          id?: string
-          is_active?: boolean | null
-          max_projects?: number | null
-          monthly_price?: number
-          priority_support?: boolean | null
-          tier_name: string
-        }
-        Update: {
-          analytics_access?: boolean | null
-          annual_price?: number
-          created_at?: string
-          features?: string[] | null
-          id?: string
-          is_active?: boolean | null
-          max_projects?: number | null
-          monthly_price?: number
-          priority_support?: boolean | null
-          tier_name?: string
         }
         Relationships: []
-      }
-      user_subscriptions: {
-        Row: {
-          created_at: string
-          end_date: string | null
-          id: string
-          is_active: boolean | null
-          payment_status: string | null
-          start_date: string
-          tier_id: string | null
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          end_date?: string | null
-          id?: string
-          is_active?: boolean | null
-          payment_status?: string | null
-          start_date: string
-          tier_id?: string | null
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          end_date?: string | null
-          id?: string
-          is_active?: boolean | null
-          payment_status?: string | null
-          start_date?: string
-          tier_id?: string | null
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "user_subscriptions_tier_id_fkey"
-            columns: ["tier_id"]
-            isOneToOne: false
-            referencedRelation: "subscription_tiers"
-            referencedColumns: ["id"]
-          },
-        ]
       }
       waitlist: {
         Row: {

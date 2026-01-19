@@ -1,5 +1,4 @@
 import { Toaster } from "@/components/ui/toaster";
-import Pricing from "./pages/Pricing";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -52,7 +51,6 @@ import NewsletterAdmin from "./pages/NewsletterAdmin";
 import RegenerativeSystemsDashboard from "./pages/RegenerativeSystemsDashboard";
 import CivilizationalArchitecture from "./pages/CivilizationalArchitecture";
 import NotFound from "./pages/NotFound";
-import ProjectSubmitForm from "./components/ProjectSubmitForm";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -79,7 +77,6 @@ const App = () => (
               
               {/* User Flow Routes */}
               <Route path="/onboarding" element={<ComprehensiveOnboarding />} />
-              <Route path="/project/new" element={<ProjectSubmitForm />} />
               <Route path="/register-project-flow" element={<ProjectRegistrationFlow />} />
               <Route path="/investment-flow" element={<InvestmentFlow />} />
               <Route path="/practitioner-flow" element={<PractitionerDashboardFlow />} />
@@ -100,7 +97,7 @@ const App = () => (
               <Route path="/how-it-works" element={<><EcosystemNavigation /><div className="md:ml-80"><HowItWorks /></div></>} />
               <Route path="/admin" element={<><EcosystemNavigation /><div className="md:ml-80"><AdminPanel /></div></>} />
               <Route path="/business-model" element={<><EcosystemNavigation /><div className="md:ml-80"><BusinessModel /></div></>} />
-              <Route path="/pricing" element={<><EcosystemNavigation /><div className="md:ml-80"><Pricing /></div></>} />
+              <Route path="/pricing" element={<><EcosystemNavigation /><div className="md:ml-80"><SubscriptionPlans /></div></>} />
               <Route path="/enterprise" element={<><EcosystemNavigation /><div className="md:ml-80"><StakeholderSelector /></div></>} />
               <Route path="/practitioner" element={<><EcosystemNavigation /><div className="md:ml-80"><PractitionerDashboard /></div></>} />
               <Route path="/investor" element={<><EcosystemNavigation /><div className="md:ml-80"><InvestorDashboard /></div></>} />

@@ -1,9 +1,12 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Heart, Users, Shield, Droplets, Brain, TrendingUp, Activity } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 interface HealthCommunity {
   id: string;
@@ -72,56 +75,44 @@ interface MentalHealthWellbeing {
   assessed_at: string;
 }
 
-// Mock data
-const mockCommunities: HealthCommunity[] = [
-  { id: '1', community_name: 'Green Valley Village', population_size: 12500, community_type: 'rural', health_coordinator: 'Dr. Maria Santos', baseline_health_assessment: {}, created_at: '2024-01-15' },
-  { id: '2', community_name: 'Coastal Bay Township', population_size: 28000, community_type: 'coastal', health_coordinator: 'Dr. James Okonkwo', baseline_health_assessment: {}, created_at: '2024-02-20' },
-  { id: '3', community_name: 'Highland Indigenous Reserve', population_size: 5200, community_type: 'indigenous', health_coordinator: 'Elder Sarah Whitehorse', baseline_health_assessment: {}, created_at: '2024-03-10' },
-  { id: '4', community_name: 'Metro East District', population_size: 85000, community_type: 'urban', health_coordinator: 'Dr. Chen Wei', baseline_health_assessment: {}, created_at: '2024-01-05' },
-];
-
-const mockHealthcareAccess: HealthcareAccess[] = [
-  { id: '1', community_id: '1', facility_type: 'primary_care', facility_name: 'Green Valley Health Center', distance_km: 2.5, accessibility_score: 0.85, utilization_rate: 72, assessed_at: '2024-06-01' },
-  { id: '2', community_id: '2', facility_type: 'hospital', facility_name: 'Coastal Regional Hospital', distance_km: 8.2, accessibility_score: 0.78, utilization_rate: 65, assessed_at: '2024-06-01' },
-  { id: '3', community_id: '3', facility_type: 'mobile_clinic', facility_name: 'Highland Mobile Health Unit', distance_km: 0, accessibility_score: 0.92, utilization_rate: 88, assessed_at: '2024-06-01' },
-  { id: '4', community_id: '4', facility_type: 'specialty_center', facility_name: 'Metro East Medical Complex', distance_km: 1.2, accessibility_score: 0.95, utilization_rate: 82, assessed_at: '2024-06-01' },
-];
-
-const mockHealthMetrics: CommunityHealthMetric[] = [
-  { id: '1', community_id: '1', metric_category: 'maternal_health', metric_name: 'Maternal Mortality Rate', baseline_value: 250, current_value: 145, target_value: 100, improvement_percentage: 42, confidence_level: 0.88, measured_at: '2024-06-15' },
-  { id: '2', community_id: '2', metric_category: 'child_health', metric_name: 'Under-5 Vaccination Rate', baseline_value: 65, current_value: 89, target_value: 95, improvement_percentage: 37, confidence_level: 0.92, measured_at: '2024-06-15' },
-  { id: '3', community_id: '3', metric_category: 'infectious_disease', metric_name: 'Malaria Incidence', baseline_value: 180, current_value: 72, target_value: 50, improvement_percentage: 60, confidence_level: 0.85, measured_at: '2024-06-15' },
-  { id: '4', community_id: '4', metric_category: 'chronic_disease', metric_name: 'Diabetes Prevalence', baseline_value: 12, current_value: 10.2, target_value: 8, improvement_percentage: 15, confidence_level: 0.78, measured_at: '2024-06-15' },
-];
-
-const mockPreventivePrograms: PreventiveHealthProgram[] = [
-  { id: '1', community_id: '1', program_name: 'Clean Water Initiative', program_type: 'sanitation', coverage_percentage: 78, participation_rate: 92, effectiveness_score: 0.88, program_status: 'active', created_at: '2023-06-01' },
-  { id: '2', community_id: '2', program_name: 'Maternal Care Plus', program_type: 'maternal_health', coverage_percentage: 85, participation_rate: 76, effectiveness_score: 0.82, program_status: 'active', created_at: '2023-08-15' },
-  { id: '3', community_id: '3', program_name: 'Traditional Medicine Integration', program_type: 'community_health', coverage_percentage: 95, participation_rate: 88, effectiveness_score: 0.79, program_status: 'active', created_at: '2023-04-20' },
-  { id: '4', community_id: '4', program_name: 'Urban Wellness Program', program_type: 'lifestyle', coverage_percentage: 45, participation_rate: 38, effectiveness_score: 0.65, program_status: 'planned', created_at: '2024-01-10' },
-];
-
-const mockNutrition: NutritionSecurity[] = [
-  { id: '1', community_id: '1', malnutrition_rate: 8.5, stunting_rate: 12.3, food_security_score: 72, dietary_diversity_score: 6.8, assessed_at: '2024-05-01' },
-  { id: '2', community_id: '2', malnutrition_rate: 5.2, stunting_rate: 8.1, food_security_score: 81, dietary_diversity_score: 7.5, assessed_at: '2024-05-01' },
-  { id: '3', community_id: '3', malnutrition_rate: 11.8, stunting_rate: 18.5, food_security_score: 58, dietary_diversity_score: 5.2, assessed_at: '2024-05-01' },
-  { id: '4', community_id: '4', malnutrition_rate: 3.1, stunting_rate: 4.2, food_security_score: 89, dietary_diversity_score: 8.1, assessed_at: '2024-05-01' },
-];
-
-const mockMentalHealth: MentalHealthWellbeing[] = [
-  { id: '1', community_id: '1', depression_prevalence: 12.5, anxiety_prevalence: 15.2, stress_level_score: 42, social_cohesion_score: 78, community_resilience_score: 72, assessed_at: '2024-04-15' },
-  { id: '2', community_id: '2', depression_prevalence: 14.8, anxiety_prevalence: 18.5, stress_level_score: 52, social_cohesion_score: 68, community_resilience_score: 65, assessed_at: '2024-04-15' },
-  { id: '3', community_id: '3', depression_prevalence: 8.2, anxiety_prevalence: 10.5, stress_level_score: 35, social_cohesion_score: 92, community_resilience_score: 88, assessed_at: '2024-04-15' },
-  { id: '4', community_id: '4', depression_prevalence: 18.5, anxiety_prevalence: 22.1, stress_level_score: 68, social_cohesion_score: 55, community_resilience_score: 52, assessed_at: '2024-04-15' },
-];
-
 export default function HumanHealth() {
-  const [communities] = useState<HealthCommunity[]>(mockCommunities);
-  const [healthcareAccess] = useState<HealthcareAccess[]>(mockHealthcareAccess);
-  const [healthMetrics] = useState<CommunityHealthMetric[]>(mockHealthMetrics);
-  const [preventivePrograms] = useState<PreventiveHealthProgram[]>(mockPreventivePrograms);
-  const [nutrition] = useState<NutritionSecurity[]>(mockNutrition);
-  const [mentalHealth] = useState<MentalHealthWellbeing[]>(mockMentalHealth);
+  const [communities, setCommunities] = useState<HealthCommunity[]>([]);
+  const [healthcareAccess, setHealthcareAccess] = useState<HealthcareAccess[]>([]);
+  const [healthMetrics, setHealthMetrics] = useState<CommunityHealthMetric[]>([]);
+  const [preventivePrograms, setPreventivePrograms] = useState<PreventiveHealthProgram[]>([]);
+  const [nutrition, setNutrition] = useState<NutritionSecurity[]>([]);
+  const [mentalHealth, setMentalHealth] = useState<MentalHealthWellbeing[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchHealthData();
+    const interval = setInterval(fetchHealthData, 60000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const fetchHealthData = async () => {
+    try {
+      const [communitiesRes, accessRes, metricsRes, programsRes, nutritionRes, mentalRes] = await Promise.all([
+        supabase.from('health_communities').select('*').order('created_at', { ascending: false }),
+        supabase.from('healthcare_access').select('*').order('assessed_at', { ascending: false }).limit(20),
+        supabase.from('community_health_metrics').select('*').gte('confidence_level', 0.7).order('measured_at', { ascending: false }).limit(25),
+        supabase.from('preventive_health_programs').select('*').order('created_at', { ascending: false }).limit(20),
+        supabase.from('nutrition_security').select('*').order('assessed_at', { ascending: false }).limit(15),
+        supabase.from('mental_health_wellbeing').select('*').order('assessed_at', { ascending: false }).limit(15)
+      ]);
+
+      if (communitiesRes.data) setCommunities(communitiesRes.data);
+      if (accessRes.data) setHealthcareAccess(accessRes.data);
+      if (metricsRes.data) setHealthMetrics(metricsRes.data);
+      if (programsRes.data) setPreventivePrograms(programsRes.data);
+      if (nutritionRes.data) setNutrition(nutritionRes.data);
+      if (mentalRes.data) setMentalHealth(mentalRes.data);
+    } catch (error) {
+      console.error('Error fetching health data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const getCommunityTypeIcon = (type: string) => {
     switch (type) {
@@ -154,6 +145,11 @@ export default function HumanHealth() {
     return communities.reduce((sum, community) => sum + community.population_size, 0);
   };
 
+  const getAverageAccessibilityScore = () => {
+    if (healthcareAccess.length === 0) return 0;
+    return healthcareAccess.reduce((sum, access) => sum + access.accessibility_score, 0) / healthcareAccess.length;
+  };
+
   const getActivePrograms = () => {
     return preventivePrograms.filter(p => p.program_status === 'active').length;
   };
@@ -162,6 +158,10 @@ export default function HumanHealth() {
     if (healthMetrics.length === 0) return 0;
     return healthMetrics.reduce((sum, metric) => sum + metric.improvement_percentage, 0) / healthMetrics.length;
   };
+
+  if (loading) {
+    return <div className="flex items-center justify-center h-64">Loading health data...</div>;
+  }
 
   return (
     <div className="container mx-auto p-6 space-y-6">
@@ -176,7 +176,7 @@ export default function HumanHealth() {
             <div className="flex items-center gap-2">
               <Users className="h-5 w-5 text-blue-600" />
               <div>
-                <p className="text-sm text-muted-foreground">Communities</p>
+                <p className="text-sm text-gray-600">Communities</p>
                 <p className="text-2xl font-bold">{communities.length}</p>
               </div>
             </div>
@@ -187,7 +187,7 @@ export default function HumanHealth() {
             <div className="flex items-center gap-2">
               <Activity className="h-5 w-5 text-green-600" />
               <div>
-                <p className="text-sm text-muted-foreground">Total Population</p>
+                <p className="text-sm text-gray-600">Total Population</p>
                 <p className="text-2xl font-bold">{getTotalPopulation().toLocaleString()}</p>
               </div>
             </div>
@@ -198,7 +198,7 @@ export default function HumanHealth() {
             <div className="flex items-center gap-2">
               <Shield className="h-5 w-5 text-purple-600" />
               <div>
-                <p className="text-sm text-muted-foreground">Active Programs</p>
+                <p className="text-sm text-gray-600">Active Programs</p>
                 <p className="text-2xl font-bold">{getActivePrograms()}</p>
               </div>
             </div>
@@ -209,7 +209,7 @@ export default function HumanHealth() {
             <div className="flex items-center gap-2">
               <TrendingUp className="h-5 w-5 text-orange-600" />
               <div>
-                <p className="text-sm text-muted-foreground">Health Improvement</p>
+                <p className="text-sm text-gray-600">Health Improvement</p>
                 <p className="text-2xl font-bold text-green-600">+{getAverageHealthImprovement().toFixed(1)}%</p>
               </div>
             </div>
@@ -242,18 +242,18 @@ export default function HumanHealth() {
                 <CardContent>
                   <div className="space-y-3">
                     <div>
-                      <p className="text-sm text-muted-foreground">Population</p>
+                      <p className="text-sm text-gray-600">Population</p>
                       <p className="font-semibold">{community.population_size.toLocaleString()}</p>
                     </div>
                     <div>
-                      <p className="text-sm text-muted-foreground">Community Type</p>
+                      <p className="text-sm text-gray-600">Community Type</p>
                       <p className="font-semibold capitalize">{community.community_type}</p>
                     </div>
                     <div>
-                      <p className="text-sm text-muted-foreground">Health Coordinator</p>
+                      <p className="text-sm text-gray-600">Health Coordinator</p>
                       <p className="font-semibold">{community.health_coordinator}</p>
                     </div>
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-xs text-gray-500">
                       Established: {new Date(community.created_at).toLocaleDateString()}
                     </p>
                   </div>
@@ -277,11 +277,11 @@ export default function HumanHealth() {
                   <div className="space-y-3">
                     <div className="grid grid-cols-2 gap-4 text-sm">
                       <div>
-                        <p className="text-muted-foreground">Facility Type</p>
+                        <p className="text-gray-600">Facility Type</p>
                         <p className="font-semibold capitalize">{access.facility_type.replace('_', ' ')}</p>
                       </div>
                       <div>
-                        <p className="text-muted-foreground">Distance</p>
+                        <p className="text-gray-600">Distance</p>
                         <p className="font-semibold">{access.distance_km.toFixed(1)} km</p>
                       </div>
                     </div>
@@ -301,7 +301,7 @@ export default function HumanHealth() {
                       </div>
                       <Progress value={access.utilization_rate} />
                     </div>
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-xs text-gray-500">
                       Assessed: {new Date(access.assessed_at).toLocaleDateString()}
                     </p>
                   </div>
@@ -328,19 +328,19 @@ export default function HumanHealth() {
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                   <div>
-                    <p className="text-sm text-muted-foreground">Baseline</p>
+                    <p className="text-sm text-gray-600">Baseline</p>
                     <p className="font-semibold">{metric.baseline_value.toLocaleString()}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-muted-foreground">Current</p>
+                    <p className="text-sm text-gray-600">Current</p>
                     <p className="font-semibold">{metric.current_value.toLocaleString()}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-muted-foreground">Target</p>
+                    <p className="text-sm text-gray-600">Target</p>
                     <p className="font-semibold">{metric.target_value.toLocaleString()}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-muted-foreground">Improvement</p>
+                    <p className="text-sm text-gray-600">Improvement</p>
                     <p className="font-semibold text-green-600">+{metric.improvement_percentage.toFixed(1)}%</p>
                   </div>
                 </div>
@@ -350,11 +350,11 @@ export default function HumanHealth() {
                     <span>{(((metric.current_value - metric.baseline_value) / (metric.target_value - metric.baseline_value)) * 100).toFixed(1)}%</span>
                   </div>
                   <Progress value={((metric.current_value - metric.baseline_value) / (metric.target_value - metric.baseline_value)) * 100} />
-                  <p className="text-xs text-muted-foreground mt-1">
+                  <p className="text-xs text-gray-500 mt-1">
                     Confidence: {(metric.confidence_level * 100).toFixed(0)}%
                   </p>
                 </div>
-                <p className="text-xs text-muted-foreground mt-2">
+                <p className="text-xs text-gray-500 mt-2">
                   Measured: {new Date(metric.measured_at).toLocaleDateString()}
                 </p>
               </CardContent>
@@ -377,16 +377,16 @@ export default function HumanHealth() {
                 <CardContent>
                   <div className="space-y-3">
                     <div>
-                      <p className="text-sm text-muted-foreground">Program Type</p>
+                      <p className="text-sm text-gray-600">Program Type</p>
                       <p className="font-semibold capitalize">{program.program_type.replace('_', ' ')}</p>
                     </div>
                     <div className="grid grid-cols-2 gap-2 text-sm">
                       <div>
-                        <p className="text-muted-foreground">Coverage</p>
+                        <p className="text-gray-600">Coverage</p>
                         <p className="font-semibold">{program.coverage_percentage.toFixed(1)}%</p>
                       </div>
                       <div>
-                        <p className="text-muted-foreground">Participation</p>
+                        <p className="text-gray-600">Participation</p>
                         <p className="font-semibold">{program.participation_rate.toFixed(1)}%</p>
                       </div>
                     </div>
@@ -399,7 +399,7 @@ export default function HumanHealth() {
                       </div>
                       <Progress value={program.effectiveness_score * 100} />
                     </div>
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-xs text-gray-500">
                       Started: {new Date(program.created_at).toLocaleDateString()}
                     </p>
                   </div>
@@ -411,41 +411,43 @@ export default function HumanHealth() {
 
         <TabsContent value="nutrition" className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {nutrition.map((nutr, index) => (
+            {nutrition.map((nutr) => (
               <Card key={nutr.id}>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Activity className="h-5 w-5" />
-                    {communities[index]?.community_name || 'Community'} - Nutrition Security
+                    Nutrition Security Assessment
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-3">
                     <div className="grid grid-cols-2 gap-4 text-sm">
                       <div>
-                        <p className="text-muted-foreground">Malnutrition Rate</p>
-                        <p className="font-semibold">{nutr.malnutrition_rate}%</p>
+                        <p className="text-gray-600">Malnutrition Rate</p>
+                        <p className="font-semibold text-red-600">{nutr.malnutrition_rate.toFixed(1)}%</p>
                       </div>
                       <div>
-                        <p className="text-muted-foreground">Stunting Rate</p>
-                        <p className="font-semibold">{nutr.stunting_rate}%</p>
+                        <p className="text-gray-600">Stunting Rate</p>
+                        <p className="font-semibold text-orange-600">{nutr.stunting_rate.toFixed(1)}%</p>
                       </div>
                     </div>
                     <div>
                       <div className="flex justify-between text-sm mb-1">
                         <span>Food Security Score</span>
-                        <span>{nutr.food_security_score}/100</span>
+                        <span className={getScoreColor(nutr.food_security_score)}>
+                          {(nutr.food_security_score * 100).toFixed(0)}%
+                        </span>
                       </div>
-                      <Progress value={nutr.food_security_score} />
+                      <Progress value={nutr.food_security_score * 100} />
                     </div>
                     <div>
                       <div className="flex justify-between text-sm mb-1">
                         <span>Dietary Diversity</span>
-                        <span>{nutr.dietary_diversity_score}/10</span>
+                        <span>{nutr.dietary_diversity_score.toFixed(1)}</span>
                       </div>
-                      <Progress value={nutr.dietary_diversity_score * 10} />
+                      <Progress value={(nutr.dietary_diversity_score / 10) * 100} />
                     </div>
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-xs text-gray-500">
                       Assessed: {new Date(nutr.assessed_at).toLocaleDateString()}
                     </p>
                   </div>
@@ -457,50 +459,54 @@ export default function HumanHealth() {
 
         <TabsContent value="mental" className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {mentalHealth.map((mental, index) => (
+            {mentalHealth.map((mental) => (
               <Card key={mental.id}>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Brain className="h-5 w-5" />
-                    {communities[index]?.community_name || 'Community'} - Mental Health
+                    Mental Health & Wellbeing
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-3">
                     <div className="grid grid-cols-2 gap-4 text-sm">
                       <div>
-                        <p className="text-muted-foreground">Depression Prevalence</p>
-                        <p className="font-semibold">{mental.depression_prevalence}%</p>
+                        <p className="text-gray-600">Depression</p>
+                        <p className="font-semibold text-red-600">{mental.depression_prevalence.toFixed(1)}%</p>
                       </div>
                       <div>
-                        <p className="text-muted-foreground">Anxiety Prevalence</p>
-                        <p className="font-semibold">{mental.anxiety_prevalence}%</p>
+                        <p className="text-gray-600">Anxiety</p>
+                        <p className="font-semibold text-orange-600">{mental.anxiety_prevalence.toFixed(1)}%</p>
                       </div>
-                    </div>
-                    <div>
-                      <div className="flex justify-between text-sm mb-1">
-                        <span>Stress Level</span>
-                        <span className={mental.stress_level_score > 50 ? 'text-red-600' : 'text-green-600'}>
-                          {mental.stress_level_score}/100
-                        </span>
-                      </div>
-                      <Progress value={mental.stress_level_score} className={mental.stress_level_score > 50 ? '[&>div]:bg-red-500' : ''} />
                     </div>
                     <div>
                       <div className="flex justify-between text-sm mb-1">
                         <span>Social Cohesion</span>
-                        <span className="text-green-600">{mental.social_cohesion_score}/100</span>
+                        <span className={getScoreColor(mental.social_cohesion_score)}>
+                          {(mental.social_cohesion_score * 100).toFixed(0)}%
+                        </span>
                       </div>
-                      <Progress value={mental.social_cohesion_score} />
+                      <Progress value={mental.social_cohesion_score * 100} />
                     </div>
                     <div>
                       <div className="flex justify-between text-sm mb-1">
                         <span>Community Resilience</span>
-                        <span>{mental.community_resilience_score}/100</span>
+                        <span className={getScoreColor(mental.community_resilience_score)}>
+                          {(mental.community_resilience_score * 100).toFixed(0)}%
+                        </span>
                       </div>
-                      <Progress value={mental.community_resilience_score} />
+                      <Progress value={mental.community_resilience_score * 100} />
                     </div>
-                    <p className="text-xs text-muted-foreground">
+                    <div>
+                      <div className="flex justify-between text-sm mb-1">
+                        <span>Stress Level</span>
+                        <span className={mental.stress_level_score <= 0.3 ? 'text-green-600' : mental.stress_level_score <= 0.6 ? 'text-yellow-600' : 'text-red-600'}>
+                          {(mental.stress_level_score * 100).toFixed(0)}%
+                        </span>
+                      </div>
+                      <Progress value={mental.stress_level_score * 100} />
+                    </div>
+                    <p className="text-xs text-gray-500">
                       Assessed: {new Date(mental.assessed_at).toLocaleDateString()}
                     </p>
                   </div>

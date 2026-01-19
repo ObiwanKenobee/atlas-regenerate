@@ -1,23 +1,62 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 import { Zap, BookOpen, Users, Award, TrendingUp, GitBranch, Lightbulb, Globe } from "lucide-react";
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, LineChart, Line } from "recharts";
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, ScatterChart, Scatter, LineChart, Line } from "recharts";
 import { motion } from "framer-motion";
 
-// Mock data for Builder Dashboard
-const mockProjects = [
-  { id: '1', project_name: 'Climate AI Models', research_area: 'ai', funding_status: 'funded', publication_count: 12, patent_count: 2, open_source: true },
-  { id: '2', project_name: 'Soil Carbon Sensors', research_area: 'climate_tech', funding_status: 'funded', publication_count: 8, patent_count: 1, open_source: false },
-  { id: '3', project_name: 'Biodiversity Tracker', research_area: 'regenerative_science', funding_status: 'seeking', publication_count: 5, patent_count: 0, open_source: true },
-];
+interface ResearchProject {
+  id: string;
+  project_name: string;
+  research_area: string;
+  funding_status: string;
+  publication_count: number;
+  patent_count: number;
+  open_source: boolean;
+}
 
 const BuilderDashboard = () => {
-  const [projects] = useState(mockProjects);
+  const { user } = useAuth();
+  const [projects, setProjects] = useState<ResearchProject[]>([]);
+  const [loading, setLoading] = useState(true);
 
+  useEffect(() => {
+    fetchBuilderData();
+  }, [user]);
+
+  const fetchBuilderData = async () => {
+    try {
+      const { data: memberData } = await supabase
+        .from("organization_members")
+        .select(`
+          organization_id,
+          organizations!inner(*)
+        `)
+        .eq("user_id", user?.id)
+        .eq("organizations.stakeholder_type", "builder")
+        .single();
+
+      if (memberData) {
+        const { data: projectData } = await supabase
+          .from("research_projects")
+          .select("*")
+          .eq("organization_id", memberData.organization_id);
+        
+        setProjects(projectData || []);
+      }
+    } catch (error) {
+      console.error("Error fetching builder data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Mock data for visualization
   const researchPipeline = [
     { stage: "Ideation", projects: 15, funding: 250000 },
     { stage: "Proof of Concept", projects: 8, funding: 1200000 },
@@ -50,13 +89,37 @@ const BuilderDashboard = () => {
     { institution: "UC Berkeley Energy Lab", projects: 2, publications: 4, impact: 8.3 }
   ];
 
+  const impactScaling = [
+    { technology: "Carbon Capture AI", readiness: 8, market_size: 15000, adoption_rate: 25 },
+    { technology: "Soil Health Sensors", readiness: 9, market_size: 8000, adoption_rate: 45 },
+    { technology: "Biodiversity Monitoring", readiness: 7, market_size: 5000, adoption_rate: 15 },
+    { technology: "Climate Prediction Models", readiness: 9, market_size: 12000, adoption_rate: 35 }
+  ];
+
+  const getAreaIcon = (area: string) => {
+    switch (area.toLowerCase()) {
+      case "ai": return Zap;
+      case "climate_tech": return Globe;
+      case "regenerative_science": return Lightbulb;
+      default: return BookOpen;
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-hero-gradient flex items-center justify-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
   const totalProjects = projects.length;
   const totalPublications = projects.reduce((sum, p) => sum + p.publication_count, 0);
   const totalPatents = projects.reduce((sum, p) => sum + p.patent_count, 0);
   const openSourceProjects = projects.filter(p => p.open_source).length;
 
   return (
-    <div className="min-h-screen bg-background p-6">
+    <div className="min-h-screen bg-hero-gradient p-6">
       <div className="container mx-auto max-w-7xl">
         <div className="mb-8">
           <h1 className="font-serif text-4xl mb-2">Builders & Researchers Dashboard</h1>
@@ -140,6 +203,7 @@ const BuilderDashboard = () => {
             <TabsTrigger value="impact">Impact Scaling</TabsTrigger>
           </TabsList>
 
+          {/* Research Pipeline Tab */}
           <TabsContent value="pipeline" className="space-y-6">
             <Card className="glass">
               <CardHeader>
@@ -148,13 +212,16 @@ const BuilderDashboard = () => {
               <CardContent>
                 <ResponsiveContainer width="100%" height={300}>
                   <BarChart data={researchPipeline}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--muted))" />
-                    <XAxis dataKey="stage" stroke="hsl(var(--muted-foreground))" />
-                    <YAxis yAxisId="left" stroke="hsl(var(--muted-foreground))" />
-                    <YAxis yAxisId="right" orientation="right" stroke="hsl(var(--muted-foreground))" />
-                    <Tooltip />
-                    <Bar yAxisId="left" dataKey="projects" fill="hsl(var(--primary))" name="Projects" />
-                    <Bar yAxisId="right" dataKey="funding" fill="hsl(var(--accent))" name="Funding" />
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(160 20% 15%)" />
+                    <XAxis dataKey="stage" stroke="hsl(45 10% 55%)" />
+                    <YAxis yAxisId="left" stroke="hsl(45 10% 55%)" />
+                    <YAxis yAxisId="right" orientation="right" stroke="hsl(45 10% 55%)" />
+                    <Tooltip formatter={(value, name) => [
+                      name === 'funding' ? `$${(Number(value) / 1000000).toFixed(1)}M` : value,
+                      name === 'funding' ? 'Funding' : 'Projects'
+                    ]} />
+                    <Bar yAxisId="left" dataKey="projects" fill="#2d9b6e" name="Projects" />
+                    <Bar yAxisId="right" dataKey="funding" fill="#3b8fa3" name="Funding" />
                   </BarChart>
                 </ResponsiveContainer>
               </CardContent>
@@ -201,6 +268,7 @@ const BuilderDashboard = () => {
             </div>
           </TabsContent>
 
+          {/* Innovation Metrics Tab */}
           <TabsContent value="innovation" className="space-y-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <Card className="glass">
@@ -210,12 +278,12 @@ const BuilderDashboard = () => {
                 <CardContent>
                   <ResponsiveContainer width="100%" height={300}>
                     <LineChart data={innovationMetrics}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--muted))" />
-                      <XAxis dataKey="month" stroke="hsl(var(--muted-foreground))" />
-                      <YAxis stroke="hsl(var(--muted-foreground))" />
+                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(160 20% 15%)" />
+                      <XAxis dataKey="month" stroke="hsl(45 10% 55%)" />
+                      <YAxis stroke="hsl(45 10% 55%)" />
                       <Tooltip />
-                      <Line type="monotone" dataKey="publications" stroke="hsl(var(--primary))" strokeWidth={3} name="Publications" />
-                      <Line type="monotone" dataKey="patents" stroke="hsl(var(--accent))" strokeWidth={3} name="Patents" />
+                      <Line type="monotone" dataKey="publications" stroke="#2d9b6e" strokeWidth={3} name="Publications" />
+                      <Line type="monotone" dataKey="patents" stroke="#3b8fa3" strokeWidth={3} name="Patents" />
                     </LineChart>
                   </ResponsiveContainer>
                 </CardContent>
@@ -230,15 +298,15 @@ const BuilderDashboard = () => {
                     <AreaChart data={innovationMetrics}>
                       <defs>
                         <linearGradient id="citations" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3}/>
-                          <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/>
+                          <stop offset="5%" stopColor="#b8860b" stopOpacity={0.3}/>
+                          <stop offset="95%" stopColor="#b8860b" stopOpacity={0}/>
                         </linearGradient>
                       </defs>
-                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--muted))" />
-                      <XAxis dataKey="month" stroke="hsl(var(--muted-foreground))" />
-                      <YAxis stroke="hsl(var(--muted-foreground))" />
+                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(160 20% 15%)" />
+                      <XAxis dataKey="month" stroke="hsl(45 10% 55%)" />
+                      <YAxis stroke="hsl(45 10% 55%)" />
                       <Tooltip />
-                      <Area type="monotone" dataKey="citations" stroke="hsl(var(--primary))" fill="url(#citations)" />
+                      <Area type="monotone" dataKey="citations" stroke="#b8860b" fill="url(#citations)" />
                     </AreaChart>
                   </ResponsiveContainer>
                 </CardContent>
@@ -270,6 +338,7 @@ const BuilderDashboard = () => {
             </div>
           </TabsContent>
 
+          {/* Collaboration Tab */}
           <TabsContent value="collaboration" className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {collaborationNetwork.map((collab, index) => (
@@ -312,57 +381,90 @@ const BuilderDashboard = () => {
                 </motion.div>
               ))}
             </div>
+
+            <Card className="glass">
+              <CardHeader>
+                <CardTitle>Collaboration Growth</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ResponsiveContainer width="100%" height={300}>
+                  <AreaChart data={innovationMetrics}>
+                    <defs>
+                      <linearGradient id="collaborations" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#2d9b6e" stopOpacity={0.3}/>
+                        <stop offset="95%" stopColor="#2d9b6e" stopOpacity={0}/>
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(160 20% 15%)" />
+                    <XAxis dataKey="month" stroke="hsl(45 10% 55%)" />
+                    <YAxis stroke="hsl(45 10% 55%)" />
+                    <Tooltip />
+                    <Area type="monotone" dataKey="collaborations" stroke="#2d9b6e" fill="url(#collaborations)" />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
           </TabsContent>
 
+          {/* Impact Scaling Tab */}
           <TabsContent value="impact" className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <Card className="glass">
-                <CardHeader>
-                  <CardTitle>Technology Readiness</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {[
-                      { tech: "Carbon Capture AI", readiness: 8 },
-                      { tech: "Soil Health Sensors", readiness: 9 },
-                      { tech: "Biodiversity Monitoring", readiness: 7 },
-                      { tech: "Climate Prediction", readiness: 9 }
-                    ].map((item) => (
-                      <div key={item.tech} className="space-y-2">
-                        <div className="flex justify-between text-sm">
-                          <span>{item.tech}</span>
-                          <span>TRL {item.readiness}</span>
-                        </div>
-                        <Progress value={item.readiness * 10} className="h-2" />
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
+            <Card className="glass">
+              <CardHeader>
+                <CardTitle>Technology Readiness vs Market Adoption</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ResponsiveContainer width="100%" height={400}>
+                  <ScatterChart data={impactScaling}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(160 20% 15%)" />
+                    <XAxis dataKey="readiness" stroke="hsl(45 10% 55%)" name="Technology Readiness" />
+                    <YAxis dataKey="adoption_rate" stroke="hsl(45 10% 55%)" name="Adoption Rate %" />
+                    <Tooltip formatter={(value, name, props) => [
+                      name === 'market_size' ? `$${value}M` : `${value}${name === 'adoption_rate' ? '%' : ''}`,
+                      name === 'market_size' ? 'Market Size' : name === 'adoption_rate' ? 'Adoption Rate' : 'Readiness Level'
+                    ]} />
+                    <Scatter dataKey="adoption_rate" fill="#2d9b6e" />
+                  </ScatterChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
 
-              <Card className="glass">
-                <CardHeader>
-                  <CardTitle>Market Adoption</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {[
-                      { tech: "Carbon Capture AI", adoption: 25 },
-                      { tech: "Soil Health Sensors", adoption: 45 },
-                      { tech: "Biodiversity Monitoring", adoption: 15 },
-                      { tech: "Climate Prediction", adoption: 35 }
-                    ].map((item) => (
-                      <div key={item.tech} className="space-y-2">
-                        <div className="flex justify-between text-sm">
-                          <span>{item.tech}</span>
-                          <span>{item.adoption}%</span>
-                        </div>
-                        <Progress value={item.adoption} className="h-2" />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {impactScaling.map((tech, index) => (
+                <motion.div
+                  key={tech.technology}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                >
+                  <Card className="glass">
+                    <CardContent className="p-6">
+                      <div className="flex items-center justify-between mb-4">
+                        <h3 className="font-medium">{tech.technology}</h3>
+                        <Badge variant={tech.readiness >= 8 ? "default" : "outline"}>
+                          TRL {tech.readiness}
+                        </Badge>
                       </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
+                      <div className="space-y-3">
+                        <div className="flex justify-between text-sm">
+                          <span>Market Size:</span>
+                          <span className="font-medium">${tech.market_size}M</span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span>Adoption Rate:</span>
+                          <span className="font-medium">{tech.adoption_rate}%</span>
+                        </div>
+                        <div className="space-y-1">
+                          <div className="flex justify-between text-sm">
+                            <span>Readiness:</span>
+                            <span>{tech.readiness}/10</span>
+                          </div>
+                          <Progress value={tech.readiness * 10} className="h-2" />
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              ))}
             </div>
           </TabsContent>
         </Tabs>

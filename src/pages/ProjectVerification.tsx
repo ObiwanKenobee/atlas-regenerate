@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
+import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { MapPin, CheckCircle, XCircle, Clock, FileText, Users, Eye } from "lucide-react";
 import { motion } from "framer-motion";
@@ -29,73 +30,88 @@ interface ProjectDetails {
   landUse: any[];
 }
 
-// Mock data
-const mockProjects: RestorationProject[] = [
-  { id: '1', project_name: 'Amazon Reforestation Initiative', project_type: 'carbon_sequestration', total_area: 500, location_description: 'Northern Amazon Basin, Brazil', registration_status: 'submitted', created_at: '2024-06-01', practitioner_id: '1' },
-  { id: '2', project_name: 'Coastal Mangrove Restoration', project_type: 'marine_protection', total_area: 150, location_description: 'Sundarbans Delta, Bangladesh', registration_status: 'submitted', created_at: '2024-06-05', practitioner_id: '2' },
-  { id: '3', project_name: 'Regenerative Agriculture Pilot', project_type: 'soil_restoration', total_area: 200, location_description: 'Central Valley, California', registration_status: 'verified', created_at: '2024-05-15', practitioner_id: '3' },
-  { id: '4', project_name: 'Highland Forest Conservation', project_type: 'biodiversity_conservation', total_area: 800, location_description: 'Ethiopian Highlands', registration_status: 'active', created_at: '2024-04-20', practitioner_id: '4' },
-  { id: '5', project_name: 'Wetland Ecosystem Revival', project_type: 'watershed_restoration', total_area: 300, location_description: 'Mississippi Delta, USA', registration_status: 'verified', created_at: '2024-05-28', practitioner_id: '5' }
-];
-
-const mockProjectDetails: Record<string, ProjectDetails> = {
-  '1': {
-    project: mockProjects[0],
-    boundaries: [{ verification_method: 'satellite', area_hectares: 500 }],
-    assessments: [
-      { assessment_type: 'carbon_stock', baseline_value: 45, measurement_unit: 'tons/ha', assessment_method: 'Remote sensing', assessor_name: 'Dr. Maria Santos' },
-      { assessment_type: 'biodiversity', baseline_value: 62, measurement_unit: 'score', assessment_method: 'Field survey', assessor_name: 'Dr. Carlos Rivera' }
-    ],
-    stakeholders: [
-      { stakeholder_name: 'Indigenous Community Council', stakeholder_type: 'community', role_in_project: 'Primary stewards', engagement_level: 'high' },
-      { stakeholder_name: 'Amazon Conservation NGO', stakeholder_type: 'ngo', role_in_project: 'Technical support', engagement_level: 'high' }
-    ],
-    landUse: [{ land_use_type: 'degraded', management_practices: 'Previously logged area' }]
-  },
-  '2': {
-    project: mockProjects[1],
-    boundaries: [{ verification_method: 'drone', area_hectares: 150 }],
-    assessments: [
-      { assessment_type: 'water_quality', baseline_value: 55, measurement_unit: 'score', assessment_method: 'Lab analysis', assessor_name: 'Dr. Akhtar Rahman' }
-    ],
-    stakeholders: [
-      { stakeholder_name: 'Coastal Fishers Cooperative', stakeholder_type: 'community', role_in_project: 'Implementation partners', engagement_level: 'high' }
-    ],
-    landUse: [{ land_use_type: 'degraded', management_practices: 'Mangrove loss due to shrimp farming' }]
-  }
-};
-
 const ProjectVerification = () => {
   const { user } = useAuth();
-  const [projects, setProjects] = useState<RestorationProject[]>(mockProjects);
+  const [projects, setProjects] = useState<RestorationProject[]>([]);
   const [selectedProject, setSelectedProject] = useState<ProjectDetails | null>(null);
+  const [loading, setLoading] = useState(true);
   const [verificationNotes, setVerificationNotes] = useState("");
 
-  const fetchProjectDetails = (projectId: string) => {
-    const details = mockProjectDetails[projectId];
-    if (details) {
-      setSelectedProject(details);
-    } else {
-      // Create default details for projects without mock data
-      const project = projects.find(p => p.id === projectId);
-      if (project) {
-        setSelectedProject({
-          project,
-          boundaries: [],
-          assessments: [],
-          stakeholders: [],
-          landUse: []
-        });
-      }
+  useEffect(() => {
+    fetchProjects();
+  }, []);
+
+  const fetchProjects = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("restoration_projects")
+        .select("*")
+        .in("registration_status", ["submitted", "verified", "active"])
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+      setProjects(data || []);
+    } catch (error) {
+      console.error("Error fetching projects:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleVerification = (projectId: string, status: string) => {
-    setProjects(projects.map(p => 
-      p.id === projectId ? { ...p, registration_status: status } : p
-    ));
-    toast.success(`Project ${status === "verified" ? "approved" : "rejected"} successfully`);
-    setVerificationNotes("");
+  const fetchProjectDetails = async (projectId: string) => {
+    try {
+      const [projectRes, boundariesRes, assessmentsRes, stakeholdersRes, landUseRes] = await Promise.all([
+        supabase.from("restoration_projects").select("*").eq("id", projectId).single(),
+        supabase.from("project_boundaries").select("*").eq("project_id", projectId),
+        supabase.from("baseline_assessments").select("*").eq("project_id", projectId),
+        supabase.from("community_stakeholders").select("*").eq("project_id", projectId),
+        supabase.from("land_use_history").select("*").eq("project_id", projectId)
+      ]);
+
+      setSelectedProject({
+        project: projectRes.data,
+        boundaries: boundariesRes.data || [],
+        assessments: assessmentsRes.data || [],
+        stakeholders: stakeholdersRes.data || [],
+        landUse: landUseRes.data || []
+      });
+    } catch (error) {
+      console.error("Error fetching project details:", error);
+      toast.error("Failed to load project details");
+    }
+  };
+
+  const handleVerification = async (projectId: string, status: string) => {
+    try {
+      const { error } = await supabase
+        .from("restoration_projects")
+        .update({
+          registration_status: status,
+          verification_date: new Date().toISOString()
+        })
+        .eq("id", projectId);
+
+      if (error) throw error;
+
+      // Add verification notes if provided
+      if (verificationNotes) {
+        await supabase.from("verification_documents").insert({
+          project_id: projectId,
+          document_type: "verification_notes",
+          document_name: `Verification Notes - ${status}`,
+          file_url: verificationNotes, // Store notes as text
+          verified: true,
+          verified_by: user?.email || "Admin"
+        });
+      }
+
+      toast.success(`Project ${status === "verified" ? "approved" : "rejected"} successfully`);
+      fetchProjects();
+      setVerificationNotes("");
+    } catch (error) {
+      console.error("Error updating project status:", error);
+      toast.error("Failed to update project status");
+    }
   };
 
   const getStatusColor = (status: string) => {
@@ -118,6 +134,14 @@ const ProjectVerification = () => {
       default: return "🌍";
     }
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-hero-gradient flex items-center justify-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
 
   const pendingProjects = projects.filter(p => p.registration_status === "submitted");
   const verifiedProjects = projects.filter(p => p.registration_status === "verified");
@@ -295,6 +319,9 @@ const ProjectVerification = () => {
                                                 <span className="font-medium">Area:</span> {boundary.area_hectares} ha
                                               </div>
                                             </div>
+                                            <div className="mt-2 text-xs text-muted-foreground">
+                                              Boundary coordinates available for verification
+                                            </div>
                                           </div>
                                         ))}
                                       </div>
@@ -365,38 +392,41 @@ const ProjectVerification = () => {
                                         ))}
                                       </div>
                                     ) : (
-                                      <p className="text-sm text-muted-foreground">No stakeholder data provided</p>
+                                      <p className="text-sm text-muted-foreground">No stakeholder information provided</p>
                                     )}
                                   </CardContent>
                                 </Card>
 
-                                {/* Verification Notes */}
+                                {/* Verification Actions */}
                                 <Card>
                                   <CardHeader>
-                                    <CardTitle className="text-lg">Verification Notes</CardTitle>
+                                    <CardTitle className="text-lg">Verification Decision</CardTitle>
                                   </CardHeader>
                                   <CardContent className="space-y-4">
-                                    <Textarea
-                                      value={verificationNotes}
-                                      onChange={(e) => setVerificationNotes(e.target.value)}
-                                      placeholder="Add verification notes or feedback..."
-                                      rows={4}
-                                    />
+                                    <div>
+                                      <Label htmlFor="notes">Verification Notes</Label>
+                                      <Textarea
+                                        id="notes"
+                                        value={verificationNotes}
+                                        onChange={(e) => setVerificationNotes(e.target.value)}
+                                        placeholder="Add notes about the verification decision..."
+                                        rows={3}
+                                      />
+                                    </div>
                                     <div className="flex gap-3">
                                       <Button
-                                        variant="outline"
-                                        className="flex-1 border-red-200 hover:bg-red-50 text-red-700"
-                                        onClick={() => handleVerification(selectedProject.project.id, "rejected")}
-                                      >
-                                        <XCircle className="w-4 h-4 mr-2" />
-                                        Reject
-                                      </Button>
-                                      <Button
-                                        className="flex-1"
                                         onClick={() => handleVerification(selectedProject.project.id, "verified")}
+                                        className="bg-green-600 hover:bg-green-700"
                                       >
                                         <CheckCircle className="w-4 h-4 mr-2" />
-                                        Approve
+                                        Approve Project
+                                      </Button>
+                                      <Button
+                                        onClick={() => handleVerification(selectedProject.project.id, "rejected")}
+                                        variant="destructive"
+                                      >
+                                        <XCircle className="w-4 h-4 mr-2" />
+                                        Reject Project
                                       </Button>
                                     </div>
                                   </CardContent>
@@ -412,9 +442,13 @@ const ProjectVerification = () => {
               </motion.div>
             ))}
             {pendingProjects.length === 0 && (
-              <div className="text-center py-12 text-muted-foreground">
-                No pending projects to review
-              </div>
+              <Card className="glass">
+                <CardContent className="p-12 text-center">
+                  <Clock className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
+                  <h3 className="font-medium mb-2">No Pending Projects</h3>
+                  <p className="text-muted-foreground">All submitted projects have been reviewed.</p>
+                </CardContent>
+              </Card>
             )}
           </TabsContent>
 
@@ -431,18 +465,29 @@ const ProjectVerification = () => {
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-4">
-                        <div className="text-3xl">{getProjectTypeIcon(project.project_type)}</div>
+                        <div className="text-3xl">
+                          {getProjectTypeIcon(project.project_type)}
+                        </div>
                         <div>
                           <h3 className="font-medium text-lg">{project.project_name}</h3>
                           <div className="flex items-center gap-4 text-sm text-muted-foreground mt-1">
                             <span className="capitalize">{project.project_type.replace("_", " ")}</span>
                             <span>{project.total_area} hectares</span>
+                            <span>Verified {new Date(project.created_at).toLocaleDateString()}</span>
                           </div>
                         </div>
                       </div>
-                      <Badge className={getStatusColor(project.registration_status)}>
-                        {project.registration_status}
-                      </Badge>
+                      <div className="flex items-center gap-3">
+                        <Badge className={getStatusColor(project.registration_status)}>
+                          {project.registration_status}
+                        </Badge>
+                        <Button
+                          onClick={() => handleVerification(project.id, "active")}
+                          size="sm"
+                        >
+                          Activate Project
+                        </Button>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
@@ -463,12 +508,15 @@ const ProjectVerification = () => {
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-4">
-                        <div className="text-3xl">{getProjectTypeIcon(project.project_type)}</div>
+                        <div className="text-3xl">
+                          {getProjectTypeIcon(project.project_type)}
+                        </div>
                         <div>
                           <h3 className="font-medium text-lg">{project.project_name}</h3>
                           <div className="flex items-center gap-4 text-sm text-muted-foreground mt-1">
                             <span className="capitalize">{project.project_type.replace("_", " ")}</span>
                             <span>{project.total_area} hectares</span>
+                            <span>Active since {new Date(project.created_at).toLocaleDateString()}</span>
                           </div>
                         </div>
                       </div>

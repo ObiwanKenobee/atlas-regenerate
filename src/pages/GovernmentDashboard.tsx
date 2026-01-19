@@ -1,13 +1,62 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Users, Target, Globe, BarChart3, TrendingUp, Award } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
+import { Users, Target, Globe, BarChart3, TrendingUp, MapPin, Award } from "lucide-react";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from "recharts";
 import { motion } from "framer-motion";
 
+interface SustainabilityProgram {
+  id: string;
+  program_name: string;
+  program_type: string;
+  budget: number;
+  target_beneficiaries: number;
+  geographic_scope: string;
+  sdg_alignment: number[];
+}
+
 const GovernmentDashboard = () => {
+  const { user } = useAuth();
+  const [programs, setPrograms] = useState<SustainabilityProgram[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchGovernmentData();
+  }, [user]);
+
+  const fetchGovernmentData = async () => {
+    try {
+      const { data: memberData } = await supabase
+        .from("organization_members")
+        .select(`
+          organization_id,
+          organizations!inner(*)
+        `)
+        .eq("user_id", user?.id)
+        .eq("organizations.stakeholder_type", "government")
+        .single();
+
+      if (memberData) {
+        const { data: programData } = await supabase
+          .from("sustainability_programs")
+          .select("*")
+          .eq("organization_id", memberData.organization_id);
+        
+        setPrograms(programData || []);
+      }
+    } catch (error) {
+      console.error("Error fetching government data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Mock data for visualization
   const sdgProgress = [
     { goal: "SDG 1", name: "No Poverty", progress: 78, target: 85 },
     { goal: "SDG 2", name: "Zero Hunger", progress: 65, target: 80 },
@@ -33,6 +82,13 @@ const GovernmentDashboard = () => {
     { type: "Research & Innovation", count: 4, budget: 3200000, effectiveness: 88 }
   ];
 
+  const regionalImpact = [
+    { region: "Northern Region", population: 2500000, programs: 8, impact_score: 8.2 },
+    { region: "Central Region", population: 3200000, programs: 12, impact_score: 7.8 },
+    { region: "Southern Region", population: 1800000, programs: 6, impact_score: 8.5 },
+    { region: "Coastal Region", population: 2100000, programs: 9, impact_score: 8.0 }
+  ];
+
   const radarData = [
     { subject: "Poverty Reduction", A: 78, fullMark: 100 },
     { subject: "Food Security", A: 65, fullMark: 100 },
@@ -42,21 +98,41 @@ const GovernmentDashboard = () => {
     { subject: "Biodiversity", A: 74, fullMark: 100 }
   ];
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-hero-gradient flex items-center justify-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  const totalBudget = programs.reduce((sum, p) => sum + p.budget, 0);
+  const totalBeneficiaries = programs.reduce((sum, p) => sum + p.target_beneficiaries, 0);
+  const activePrograms = programs.length;
+
   return (
     <div className="min-h-screen bg-hero-gradient p-6">
       <div className="container mx-auto max-w-7xl">
         <div className="mb-8">
           <h1 className="font-serif text-4xl mb-2">Government & NGO Dashboard</h1>
-          <p className="text-muted-foreground">Monitor sustainability programs, policy impact, and SDG progress</p>
+          <p className="text-muted-foreground">
+            Monitor sustainability programs, policy impact, and SDG progress
+          </p>
         </div>
 
+        {/* Key Metrics */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
             <Card className="glass">
               <CardContent className="p-6">
                 <div className="flex items-center gap-3 mb-3">
-                  <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center"><BarChart3 className="w-5 h-5 text-primary" /></div>
-                  <div><p className="text-2xl font-bold">30</p><p className="text-sm text-muted-foreground">Active Programs</p></div>
+                  <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                    <BarChart3 className="w-5 h-5 text-primary" />
+                  </div>
+                  <div>
+                    <p className="text-2xl font-bold">{activePrograms}</p>
+                    <p className="text-sm text-muted-foreground">Active Programs</p>
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -66,8 +142,13 @@ const GovernmentDashboard = () => {
             <Card className="glass">
               <CardContent className="p-6">
                 <div className="flex items-center gap-3 mb-3">
-                  <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center"><Users className="w-5 h-5 text-primary" /></div>
-                  <div><p className="text-2xl font-bold">203K</p><p className="text-sm text-muted-foreground">Beneficiaries</p></div>
+                  <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                    <Users className="w-5 h-5 text-primary" />
+                  </div>
+                  <div>
+                    <p className="text-2xl font-bold">{(totalBeneficiaries / 1000).toFixed(0)}K</p>
+                    <p className="text-sm text-muted-foreground">Beneficiaries</p>
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -77,8 +158,13 @@ const GovernmentDashboard = () => {
             <Card className="glass">
               <CardContent className="p-6">
                 <div className="flex items-center gap-3 mb-3">
-                  <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center"><Target className="w-5 h-5 text-primary" /></div>
-                  <div><p className="text-2xl font-bold">$32.7M</p><p className="text-sm text-muted-foreground">Total Budget</p></div>
+                  <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                    <Target className="w-5 h-5 text-primary" />
+                  </div>
+                  <div>
+                    <p className="text-2xl font-bold">${(totalBudget / 1000000).toFixed(1)}M</p>
+                    <p className="text-sm text-muted-foreground">Total Budget</p>
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -88,8 +174,13 @@ const GovernmentDashboard = () => {
             <Card className="glass">
               <CardContent className="p-6">
                 <div className="flex items-center gap-3 mb-3">
-                  <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center"><Award className="w-5 h-5 text-primary" /></div>
-                  <div><p className="text-2xl font-bold">83%</p><p className="text-sm text-muted-foreground">SDG Progress</p></div>
+                  <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                    <Award className="w-5 h-5 text-primary" />
+                  </div>
+                  <div>
+                    <p className="text-2xl font-bold">83%</p>
+                    <p className="text-sm text-muted-foreground">SDG Progress</p>
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -104,21 +195,38 @@ const GovernmentDashboard = () => {
             <TabsTrigger value="regional">Regional Data</TabsTrigger>
           </TabsList>
 
+          {/* Programs Tab */}
           <TabsContent value="programs" className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {programTypes.map((program, index) => (
-                <motion.div key={program.type} initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: index * 0.1 }}>
+                <motion.div
+                  key={program.type}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                >
                   <Card className="glass">
                     <CardContent className="p-6">
                       <div className="flex items-center justify-between mb-4">
                         <h3 className="font-medium">{program.type}</h3>
-                        <Badge variant="outline">{program.effectiveness}% Effective</Badge>
+                        <Badge variant="outline">
+                          {program.effectiveness}% Effective
+                        </Badge>
                       </div>
                       <div className="space-y-3">
-                        <div className="flex justify-between text-sm"><span>Programs:</span><span className="font-medium">{program.count}</span></div>
-                        <div className="flex justify-between text-sm"><span>Budget:</span><span className="font-medium">${(program.budget / 1000000).toFixed(1)}M</span></div>
+                        <div className="flex justify-between text-sm">
+                          <span>Programs:</span>
+                          <span className="font-medium">{program.count}</span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span>Budget:</span>
+                          <span className="font-medium">${(program.budget / 1000000).toFixed(1)}M</span>
+                        </div>
                         <div className="space-y-1">
-                          <div className="flex justify-between text-sm"><span>Effectiveness:</span><span>{program.effectiveness}%</span></div>
+                          <div className="flex justify-between text-sm">
+                            <span>Effectiveness:</span>
+                            <span>{program.effectiveness}%</span>
+                          </div>
                           <Progress value={program.effectiveness} className="h-2" />
                         </div>
                       </div>
@@ -129,15 +237,25 @@ const GovernmentDashboard = () => {
             </div>
 
             <Card className="glass">
-              <CardHeader><CardTitle>Program Impact Over Time</CardTitle></CardHeader>
+              <CardHeader>
+                <CardTitle>Program Impact Over Time</CardTitle>
+              </CardHeader>
               <CardContent>
                 <ResponsiveContainer width="100%" height={300}>
                   <AreaChart data={policyImpact}>
-                    <defs><linearGradient id="beneficiaries" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#2d9b6e" stopOpacity={0.3}/><stop offset="95%" stopColor="#2d9b6e" stopOpacity={0}/></linearGradient></defs>
+                    <defs>
+                      <linearGradient id="beneficiaries" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#2d9b6e" stopOpacity={0.3}/>
+                        <stop offset="95%" stopColor="#2d9b6e" stopOpacity={0}/>
+                      </linearGradient>
+                    </defs>
                     <CartesianGrid strokeDasharray="3 3" stroke="hsl(160 20% 15%)" />
                     <XAxis dataKey="month" stroke="hsl(45 10% 55%)" />
                     <YAxis stroke="hsl(45 10% 55%)" />
-                    <Tooltip formatter={(value, name) => [name === 'beneficiaries' ? `${Number(value).toLocaleString()}` : value, name === 'beneficiaries' ? 'Beneficiaries' : name]} />
+                    <Tooltip formatter={(value, name) => [
+                      name === 'beneficiaries' ? `${Number(value).toLocaleString()}` : value,
+                      name === 'beneficiaries' ? 'Beneficiaries' : name
+                    ]} />
                     <Area type="monotone" dataKey="beneficiaries" stroke="#2d9b6e" fill="url(#beneficiaries)" />
                   </AreaChart>
                 </ResponsiveContainer>
@@ -145,17 +263,25 @@ const GovernmentDashboard = () => {
             </Card>
           </TabsContent>
 
+          {/* SDG Progress Tab */}
           <TabsContent value="sdg" className="space-y-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <Card className="glass">
-                <CardHeader><CardTitle>SDG Achievement Progress</CardTitle></CardHeader>
+                <CardHeader>
+                  <CardTitle>SDG Achievement Progress</CardTitle>
+                </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
                     {sdgProgress.map((sdg) => (
                       <div key={sdg.goal} className="space-y-2">
-                        <div className="flex justify-between text-sm"><span className="font-medium">{sdg.goal}: {sdg.name}</span><span>{sdg.progress}% / {sdg.target}%</span></div>
+                        <div className="flex justify-between text-sm">
+                          <span className="font-medium">{sdg.goal}: {sdg.name}</span>
+                          <span>{sdg.progress}% / {sdg.target}%</span>
+                        </div>
                         <Progress value={sdg.progress} className="h-3" />
-                        <div className="text-xs text-muted-foreground">Target: {sdg.target}% by 2030</div>
+                        <div className="text-xs text-muted-foreground">
+                          Target: {sdg.target}% by 2030
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -163,7 +289,9 @@ const GovernmentDashboard = () => {
               </Card>
 
               <Card className="glass">
-                <CardHeader><CardTitle>SDG Performance Radar</CardTitle></CardHeader>
+                <CardHeader>
+                  <CardTitle>SDG Performance Radar</CardTitle>
+                </CardHeader>
                 <CardContent>
                   <ResponsiveContainer width="100%" height={300}>
                     <RadarChart data={radarData}>
@@ -176,11 +304,38 @@ const GovernmentDashboard = () => {
                 </CardContent>
               </Card>
             </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <Card className="glass">
+                <CardContent className="p-6 text-center">
+                  <div className="text-3xl font-bold text-primary mb-2">6/17</div>
+                  <div className="text-sm text-muted-foreground">SDGs On Track</div>
+                  <Badge variant="default" className="mt-2">Good Progress</Badge>
+                </CardContent>
+              </Card>
+              <Card className="glass">
+                <CardContent className="p-6 text-center">
+                  <div className="text-3xl font-bold text-primary mb-2">76%</div>
+                  <div className="text-sm text-muted-foreground">Avg Progress</div>
+                  <Badge variant="outline" className="mt-2">Above Target</Badge>
+                </CardContent>
+              </Card>
+              <Card className="glass">
+                <CardContent className="p-6 text-center">
+                  <div className="text-3xl font-bold text-primary mb-2">2030</div>
+                  <div className="text-sm text-muted-foreground">Target Year</div>
+                  <Badge variant="secondary" className="mt-2">7 Years Left</Badge>
+                </CardContent>
+              </Card>
+            </div>
           </TabsContent>
 
+          {/* Policy Impact Tab */}
           <TabsContent value="impact" className="space-y-6">
             <Card className="glass">
-              <CardHeader><CardTitle>Budget Utilization vs Beneficiary Reach</CardTitle></CardHeader>
+              <CardHeader>
+                <CardTitle>Budget Utilization vs Beneficiary Reach</CardTitle>
+              </CardHeader>
               <CardContent>
                 <ResponsiveContainer width="100%" height={300}>
                   <BarChart data={policyImpact}>
@@ -195,27 +350,109 @@ const GovernmentDashboard = () => {
                 </ResponsiveContainer>
               </CardContent>
             </Card>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <Card className="glass">
+                <CardHeader>
+                  <CardTitle>Policy Effectiveness Metrics</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {[
+                      { metric: "Implementation Rate", value: 87, target: 90 },
+                      { metric: "Stakeholder Satisfaction", value: 82, target: 85 },
+                      { metric: "Cost Efficiency", value: 91, target: 80 },
+                      { metric: "Timeline Adherence", value: 78, target: 85 }
+                    ].map((item) => (
+                      <div key={item.metric} className="space-y-2">
+                        <div className="flex justify-between text-sm">
+                          <span>{item.metric}</span>
+                          <span className="font-medium">{item.value}%</span>
+                        </div>
+                        <Progress value={item.value} className="h-2" />
+                        <div className="text-xs text-muted-foreground">
+                          Target: {item.target}%
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="glass">
+                <CardHeader>
+                  <CardTitle>Impact Multipliers</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="p-4 rounded-lg bg-muted/20">
+                      <div className="text-2xl font-bold text-primary">3.2x</div>
+                      <div className="text-sm text-muted-foreground">Economic Multiplier</div>
+                      <div className="text-xs text-muted-foreground mt-1">
+                        Every $1 invested generates $3.20 in economic activity
+                      </div>
+                    </div>
+                    <div className="p-4 rounded-lg bg-muted/20">
+                      <div className="text-2xl font-bold text-primary">2.8x</div>
+                      <div className="text-sm text-muted-foreground">Social Impact Multiplier</div>
+                      <div className="text-xs text-muted-foreground mt-1">
+                        Each direct beneficiary influences 2.8 additional people
+                      </div>
+                    </div>
+                    <div className="p-4 rounded-lg bg-muted/20">
+                      <div className="text-2xl font-bold text-primary">4.1x</div>
+                      <div className="text-sm text-muted-foreground">Environmental Multiplier</div>
+                      <div className="text-xs text-muted-foreground mt-1">
+                        Direct environmental benefits create 4.1x indirect benefits
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           </TabsContent>
 
+          {/* Regional Data Tab */}
           <TabsContent value="regional" className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {[
-                { region: "Northern Region", population: 2500000, programs: 8, impact_score: 8.2 },
-                { region: "Central Region", population: 3200000, programs: 12, impact_score: 7.8 },
-                { region: "Southern Region", population: 1800000, programs: 6, impact_score: 8.5 },
-                { region: "Coastal Region", population: 2100000, programs: 9, impact_score: 8.0 }
-              ].map((region) => (
-                <Card key={region.region} className="glass">
-                  <CardHeader><CardTitle>{region.region}</CardTitle></CardHeader>
-                  <CardContent>
-                    <div className="space-y-3">
-                      <div className="flex justify-between text-sm"><span>Population:</span><span className="font-medium">{(region.population / 1000000).toFixed(1)}M</span></div>
-                      <div className="flex justify-between text-sm"><span>Active Programs:</span><span className="font-medium">{region.programs}</span></div>
-                      <div className="flex justify-between text-sm"><span>Impact Score:</span><span className="font-medium">{region.impact_score}/10</span></div>
-                      <Progress value={region.impact_score * 10} className="h-2" />
-                    </div>
-                  </CardContent>
-                </Card>
+              {regionalImpact.map((region, index) => (
+                <motion.div
+                  key={region.region}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                >
+                  <Card className="glass">
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        <MapPin className="w-5 h-5" />
+                        {region.region}
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-4">
+                        <div className="flex justify-between">
+                          <span className="text-sm text-muted-foreground">Population:</span>
+                          <span className="font-medium">{(region.population / 1000000).toFixed(1)}M</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-sm text-muted-foreground">Active Programs:</span>
+                          <span className="font-medium">{region.programs}</span>
+                        </div>
+                        <div className="space-y-2">
+                          <div className="flex justify-between text-sm">
+                            <span>Impact Score:</span>
+                            <span className="font-medium">{region.impact_score}/10</span>
+                          </div>
+                          <Progress value={region.impact_score * 10} className="h-2" />
+                        </div>
+                        <Button variant="outline" size="sm" className="w-full">
+                          View Regional Details
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </motion.div>
               ))}
             </div>
           </TabsContent>

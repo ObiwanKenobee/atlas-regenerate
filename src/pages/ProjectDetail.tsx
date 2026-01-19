@@ -7,6 +7,7 @@ import { Progress } from "@/components/ui/progress";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { ArrowLeft, MapPin, Target, TrendingUp, DollarSign, Leaf, Droplets, TreePine } from "lucide-react";
 import { motion } from "framer-motion";
@@ -36,71 +37,6 @@ interface ProjectMetric {
   recorded_at: string;
 }
 
-// Mock data
-const mockProjects: Project[] = [
-  {
-    id: '1',
-    title: 'Amazon Rainforest Restoration',
-    description: 'A comprehensive reforestation project focused on restoring degraded areas of the Amazon rainforest through indigenous-led initiatives and agroforestry systems.',
-    location: 'Amazonas, Brazil',
-    latitude: -3.4653,
-    longitude: -62.2159,
-    funding_goal: 500000,
-    funding_raised: 325000,
-    project_type: 'forestry',
-    status: 'active',
-    image_url: 'https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?w=800',
-    created_at: '2024-01-15'
-  },
-  {
-    id: '2',
-    title: 'Coral Reef Regeneration',
-    description: 'Marine ecosystem restoration focusing on coral nurseries and sustainable fishing practices in partnership with local communities.',
-    location: 'Great Barrier Reef, Australia',
-    latitude: -18.2871,
-    longitude: 147.6992,
-    funding_goal: 750000,
-    funding_raised: 450000,
-    project_type: 'marine',
-    status: 'active',
-    image_url: 'https://images.unsplash.com/photo-1546026423-cc4642628d2b?w=800',
-    created_at: '2024-02-20'
-  },
-  {
-    id: '3',
-    title: 'Regenerative Farm Network',
-    description: 'Transitioning conventional farms to regenerative practices, improving soil health, biodiversity, and farmer livelihoods.',
-    location: 'Iowa, USA',
-    latitude: 41.8780,
-    longitude: -93.0977,
-    funding_goal: 300000,
-    funding_raised: 180000,
-    project_type: 'agriculture',
-    status: 'active',
-    image_url: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800',
-    created_at: '2024-03-10'
-  }
-];
-
-const mockMetrics: Record<string, ProjectMetric[]> = {
-  '1': [
-    { id: '1', metric_name: 'Trees Planted', metric_value: 150000, metric_unit: 'trees', category: 'restoration', recorded_at: '2024-06-01' },
-    { id: '2', metric_name: 'Carbon Sequestered', metric_value: 2500, metric_unit: 'tons CO2', category: 'climate', recorded_at: '2024-06-01' },
-    { id: '3', metric_name: 'Biodiversity Index', metric_value: 78, metric_unit: 'score', category: 'biodiversity', recorded_at: '2024-06-01' },
-    { id: '4', metric_name: 'Communities Engaged', metric_value: 12, metric_unit: 'communities', category: 'social', recorded_at: '2024-06-01' }
-  ],
-  '2': [
-    { id: '1', metric_name: 'Coral Fragments Planted', metric_value: 25000, metric_unit: 'fragments', category: 'restoration', recorded_at: '2024-06-01' },
-    { id: '2', metric_name: 'Reef Area Restored', metric_value: 15, metric_unit: 'hectares', category: 'restoration', recorded_at: '2024-06-01' },
-    { id: '3', metric_name: 'Fish Species Returned', metric_value: 45, metric_unit: 'species', category: 'biodiversity', recorded_at: '2024-06-01' }
-  ],
-  '3': [
-    { id: '1', metric_name: 'Farms Converted', metric_value: 28, metric_unit: 'farms', category: 'restoration', recorded_at: '2024-06-01' },
-    { id: '2', metric_name: 'Soil Health Improvement', metric_value: 35, metric_unit: '%', category: 'soil', recorded_at: '2024-06-01' },
-    { id: '3', metric_name: 'Chemical Reduction', metric_value: 80, metric_unit: '%', category: 'environment', recorded_at: '2024-06-01' }
-  ]
-};
-
 const ProjectDetail = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -113,15 +49,43 @@ const ProjectDetail = () => {
 
   useEffect(() => {
     if (id) {
-      // Use mock data
-      const foundProject = mockProjects.find(p => p.id === id);
-      if (foundProject) {
-        setProject(foundProject);
-        setMetrics(mockMetrics[id] || []);
-      }
-      setLoading(false);
+      fetchProject();
+      fetchMetrics();
     }
   }, [id]);
+
+  const fetchProject = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("projects")
+        .select("*")
+        .eq("id", id)
+        .single();
+
+      if (error) throw error;
+      setProject(data);
+    } catch (error) {
+      console.error("Error fetching project:", error);
+      toast.error("Failed to load project details");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchMetrics = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("project_metrics")
+        .select("*")
+        .eq("project_id", id)
+        .order("recorded_at", { ascending: false });
+
+      if (error) throw error;
+      setMetrics(data || []);
+    } catch (error) {
+      console.error("Error fetching metrics:", error);
+    }
+  };
 
   const handleInvestment = async () => {
     if (!user) {
@@ -135,21 +99,35 @@ const ProjectDetail = () => {
     }
 
     setInvestmentLoading(true);
-    // Simulate investment processing
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
-    toast.success("Investment successful! Thank you for supporting regenerative impact.");
-    setInvestmentAmount("");
-    
-    // Update local state
-    if (project) {
-      setProject({
-        ...project,
-        funding_raised: project.funding_raised + parseFloat(investmentAmount)
-      });
+    try {
+      const { error } = await supabase
+        .from("investments")
+        .insert({
+          project_id: id,
+          user_id: user.id,
+          amount: parseFloat(investmentAmount),
+          investment_type: "donation",
+          status: "completed"
+        });
+
+      if (error) throw error;
+
+      // Update project funding
+      const newFundingRaised = (project?.funding_raised || 0) + parseFloat(investmentAmount);
+      await supabase
+        .from("projects")
+        .update({ funding_raised: newFundingRaised })
+        .eq("id", id);
+
+      toast.success("Investment successful! Thank you for supporting regenerative impact.");
+      setInvestmentAmount("");
+      fetchProject(); // Refresh project data
+    } catch (error) {
+      console.error("Error processing investment:", error);
+      toast.error("Failed to process investment. Please try again.");
+    } finally {
+      setInvestmentLoading(false);
     }
-    
-    setInvestmentLoading(false);
   };
 
   const getProjectIcon = (type: string) => {
