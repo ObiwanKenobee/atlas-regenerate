@@ -22,39 +22,20 @@ interface ResearchProject {
 
 const BuilderDashboard = () => {
   const { user } = useAuth();
-  const [projects, setProjects] = useState<ResearchProject[]>([]);
+  // Mock data since research_projects and organization_members tables don't exist
+  const projects: ResearchProject[] = [
+    { id: '1', project_name: 'Climate AI Modeling', research_area: 'ai', funding_status: 'funded', publication_count: 12, patent_count: 2, open_source: true },
+    { id: '2', project_name: 'Regenerative Soil Analysis', research_area: 'regenerative_science', funding_status: 'seeking', publication_count: 8, patent_count: 1, open_source: true },
+    { id: '3', project_name: 'Carbon Capture Technology', research_area: 'climate_tech', funding_status: 'funded', publication_count: 15, patent_count: 3, open_source: false },
+    { id: '4', project_name: 'Biodiversity Monitoring Platform', research_area: 'climate_tech', funding_status: 'funded', publication_count: 6, patent_count: 0, open_source: true }
+  ];
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchBuilderData();
+    // Simulate loading
+    const timer = setTimeout(() => setLoading(false), 500);
+    return () => clearTimeout(timer);
   }, [user]);
-
-  const fetchBuilderData = async () => {
-    try {
-      const { data: memberData } = await supabase
-        .from("organization_members")
-        .select(`
-          organization_id,
-          organizations!inner(*)
-        `)
-        .eq("user_id", user?.id)
-        .eq("organizations.stakeholder_type", "builder")
-        .single();
-
-      if (memberData) {
-        const { data: projectData } = await supabase
-          .from("research_projects")
-          .select("*")
-          .eq("organization_id", memberData.organization_id);
-        
-        setProjects(projectData || []);
-      }
-    } catch (error) {
-      console.error("Error fetching builder data:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   // Mock data for visualization
   const researchPipeline = [

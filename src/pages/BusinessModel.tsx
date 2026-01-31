@@ -28,29 +28,27 @@ interface CircularMetric {
 }
 
 const BusinessModel = () => {
-  const [revenueStreams, setRevenueStreams] = useState<RevenueStream[]>([]);
-  const [circularMetrics, setCircularMetrics] = useState<CircularMetric[]>([]);
+  // Mock data since revenue_streams and circular_metrics tables don't exist
+  const revenueStreams: RevenueStream[] = [
+    { id: '1', stream_name: 'Transaction Fees', stream_type: 'transaction_fee', revenue_model: 'percentage', rate: 2.5, description: 'Fees on verified impact transactions', is_active: true },
+    { id: '2', stream_name: 'Premium Subscriptions', stream_type: 'subscription', revenue_model: 'flat', rate: 99, description: 'Monthly access to advanced analytics', is_active: true },
+    { id: '3', stream_name: 'Carbon Credit Sales', stream_type: 'carbon_credits', revenue_model: 'percentage', rate: 5, description: 'Commission on carbon credit marketplace', is_active: true },
+    { id: '4', stream_name: 'Impact Bonds', stream_type: 'impact_bonds', revenue_model: 'percentage', rate: 1.5, description: 'Facilitation fee for regenerative bonds', is_active: true }
+  ];
+
+  const circularMetrics: CircularMetric[] = [
+    { id: '1', metric_type: 'waste_reduction', baseline_value: 100, current_value: 25, target_value: 10, unit: 'tons', circular_score: 0.75 },
+    { id: '2', metric_type: 'resource_efficiency', baseline_value: 60, current_value: 82, target_value: 95, unit: 'percent', circular_score: 0.86 },
+    { id: '3', metric_type: 'regeneration_rate', baseline_value: 40, current_value: 85, target_value: 100, unit: 'percent', circular_score: 0.85 }
+  ];
+
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchBusinessData();
+    // Simulate loading
+    const timer = setTimeout(() => setLoading(false), 500);
+    return () => clearTimeout(timer);
   }, []);
-
-  const fetchBusinessData = async () => {
-    try {
-      const [revenueRes, metricsRes] = await Promise.all([
-        supabase.from("revenue_streams").select("*").eq("is_active", true),
-        supabase.from("circular_metrics").select("*")
-      ]);
-
-      if (revenueRes.data) setRevenueStreams(revenueRes.data);
-      if (metricsRes.data) setCircularMetrics(metricsRes.data);
-    } catch (error) {
-      console.error("Error fetching business data:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   // Mock data for visualization
   const revenueData = [

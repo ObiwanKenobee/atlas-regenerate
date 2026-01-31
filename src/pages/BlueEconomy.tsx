@@ -73,43 +73,46 @@ interface BlueCarbonEcosystem {
 }
 
 export default function BlueEconomy() {
-  const [marineProjects, setMarineProjects] = useState<MarineProject[]>([]);
-  const [oceanVitality, setOceanVitality] = useState<OceanVitalityMonitoring[]>([]);
-  const [biodiversity, setBiodiversity] = useState<MarineBiodiversity[]>([]);
-  const [coralHealth, setCoralHealth] = useState<CoralReefHealth[]>([]);
-  const [aquaculture, setAquaculture] = useState<SustainableAquaculture[]>([]);
-  const [blueCarbon, setBlueCarbon] = useState<BlueCarbonEcosystem[]>([]);
+  // Mock data since marine-specific tables don't exist yet
+  const marineProjects: MarineProject[] = [
+    { id: '1', project_name: 'Pacific Coral Restoration', project_type: 'coral_restoration', ocean_region: 'Pacific Ocean', project_manager: 'Dr. Marina Johnson', start_date: '2025-01-15', stakeholder_communities: ['Fiji Islands', 'Tonga'], conservation_goals: {} },
+    { id: '2', project_name: 'North Sea Marine Protected Area', project_type: 'marine_protected_area', ocean_region: 'North Sea', project_manager: 'Prof. Erik Nielsen', start_date: '2024-06-01', stakeholder_communities: ['Coastal UK', 'Norway'], conservation_goals: {} },
+    { id: '3', project_name: 'Sustainable Tuna Fishery', project_type: 'sustainable_fishery', ocean_region: 'Indian Ocean', project_manager: 'Dr. Priya Sharma', start_date: '2024-09-20', stakeholder_communities: ['Maldives', 'Sri Lanka'], conservation_goals: {} }
+  ];
+
+  const oceanVitality: OceanVitalityMonitoring[] = [
+    { id: '1', marine_project_id: '1', water_temperature: 24.5, ph_level: 8.12, dissolved_oxygen: 7.2, chlorophyll_a: 0.45, ocean_health_score: 0.82, measured_at: '2026-01-30' },
+    { id: '2', marine_project_id: '2', water_temperature: 12.8, ph_level: 8.08, dissolved_oxygen: 8.1, chlorophyll_a: 0.62, ocean_health_score: 0.78, measured_at: '2026-01-29' }
+  ];
+
+  const biodiversity: MarineBiodiversity[] = [
+    { id: '1', marine_project_id: '1', species_category: 'fish', species_name: 'Blue Marlin', population_count: 1250, conservation_status: 'vulnerable', habitat_quality: 0.75, observed_at: '2026-01-28' },
+    { id: '2', marine_project_id: '1', species_category: 'coral', species_name: 'Staghorn Coral', population_count: 3500, conservation_status: 'endangered', habitat_quality: 0.68, observed_at: '2026-01-27' },
+    { id: '3', marine_project_id: '2', species_category: 'mammal', species_name: 'Harbor Seal', population_count: 850, conservation_status: 'least_concern', habitat_quality: 0.85, observed_at: '2026-01-26' }
+  ];
+
+  const coralHealth: CoralReefHealth[] = [
+    { id: '1', marine_project_id: '1', coral_cover_percentage: 42.5, coral_diversity_index: 0.756, bleaching_severity: 0.15, resilience_score: 0.72, assessed_at: '2026-01-25' },
+    { id: '2', marine_project_id: '2', coral_cover_percentage: 35.2, coral_diversity_index: 0.682, bleaching_severity: 0.22, resilience_score: 0.65, assessed_at: '2026-01-24' }
+  ];
+
+  const aquaculture: SustainableAquaculture[] = [
+    { id: '1', marine_project_id: '1', farm_name: 'Pacific Pearl Farm', aquaculture_type: 'integrated', species_cultivated: ['Oysters', 'Seaweed'], current_production: 12500, environmental_impact_score: 0.88, sustainability_certifications: ['ASC', 'MSC'] },
+    { id: '2', marine_project_id: '3', farm_name: 'Ocean Harvest Tuna', aquaculture_type: 'cage', species_cultivated: ['Bluefin Tuna'], current_production: 8500, environmental_impact_score: 0.72, sustainability_certifications: ['MSC'] }
+  ];
+
+  const blueCarbon: BlueCarbonEcosystem[] = [
+    { id: '1', marine_project_id: '1', ecosystem_type: 'mangrove', ecosystem_area_hectares: 1250, carbon_sequestration_rate: 8.5, ecosystem_health_score: 0.82, measured_at: '2026-01-20' },
+    { id: '2', marine_project_id: '2', ecosystem_type: 'seagrass', ecosystem_area_hectares: 850, carbon_sequestration_rate: 6.2, ecosystem_health_score: 0.78, measured_at: '2026-01-19' }
+  ];
+
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchBlueEconomyData();
-    const interval = setInterval(fetchBlueEconomyData, 60000);
-    return () => clearInterval(interval);
+    // Simulate loading
+    const timer = setTimeout(() => setLoading(false), 500);
+    return () => clearTimeout(timer);
   }, []);
-
-  const fetchBlueEconomyData = async () => {
-    try {
-      const [projectsRes, vitalityRes, biodiversityRes, coralRes, aquacultureRes, carbonRes] = await Promise.all([
-        supabase.from('marine_projects').select('*').order('created_at', { ascending: false }),
-        supabase.from('ocean_vitality_monitoring').select('*').order('measured_at', { ascending: false }).limit(20),
-        supabase.from('marine_biodiversity').select('*').order('observed_at', { ascending: false }).limit(25),
-        supabase.from('coral_reef_health').select('*').order('assessed_at', { ascending: false }).limit(15),
-        supabase.from('sustainable_aquaculture').select('*').order('created_at', { ascending: false }),
-        supabase.from('blue_carbon_ecosystems').select('*').order('measured_at', { ascending: false }).limit(20)
-      ]);
-
-      if (projectsRes.data) setMarineProjects(projectsRes.data);
-      if (vitalityRes.data) setOceanVitality(vitalityRes.data);
-      if (biodiversityRes.data) setBiodiversity(biodiversityRes.data);
-      if (coralRes.data) setCoralHealth(coralRes.data);
-      if (aquacultureRes.data) setAquaculture(aquacultureRes.data);
-      if (carbonRes.data) setBlueCarbon(carbonRes.data);
-    } catch (error) {
-      console.error('Error fetching blue economy data:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const getProjectTypeIcon = (type: string) => {
     switch (type) {
