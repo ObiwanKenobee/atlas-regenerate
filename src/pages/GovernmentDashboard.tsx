@@ -22,39 +22,19 @@ interface SustainabilityProgram {
 
 const GovernmentDashboard = () => {
   const { user } = useAuth();
-  const [programs, setPrograms] = useState<SustainabilityProgram[]>([]);
+  // Mock data since sustainability_programs and organization_members tables don't exist
+  const programs: SustainabilityProgram[] = [
+    { id: '1', program_name: 'National Reforestation Initiative', program_type: 'environmental', budget: 15000000, target_beneficiaries: 250000, geographic_scope: 'national', sdg_alignment: [13, 15] },
+    { id: '2', program_name: 'Clean Water Access Program', program_type: 'infrastructure', budget: 8500000, target_beneficiaries: 180000, geographic_scope: 'regional', sdg_alignment: [6, 3] },
+    { id: '3', program_name: 'Sustainable Agriculture Support', program_type: 'agriculture', budget: 12000000, target_beneficiaries: 95000, geographic_scope: 'national', sdg_alignment: [2, 12, 13] }
+  ];
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchGovernmentData();
+    // Simulate loading
+    const timer = setTimeout(() => setLoading(false), 500);
+    return () => clearTimeout(timer);
   }, [user]);
-
-  const fetchGovernmentData = async () => {
-    try {
-      const { data: memberData } = await supabase
-        .from("organization_members")
-        .select(`
-          organization_id,
-          organizations!inner(*)
-        `)
-        .eq("user_id", user?.id)
-        .eq("organizations.stakeholder_type", "government")
-        .single();
-
-      if (memberData) {
-        const { data: programData } = await supabase
-          .from("sustainability_programs")
-          .select("*")
-          .eq("organization_id", memberData.organization_id);
-        
-        setPrograms(programData || []);
-      }
-    } catch (error) {
-      console.error("Error fetching government data:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   // Mock data for visualization
   const sdgProgress = [

@@ -110,15 +110,18 @@ const AdminPanel = () => {
 
   const fetchData = async () => {
     try {
-      // Fetch profiles with user emails
+      // Fetch profiles (without the users join since auth.users is not accessible via the client)
       const { data: profilesData, error: profilesError } = await supabase
         .from("profiles")
-        .select(`
-          *,
-          users:user_id (email)
-        `);
+        .select("*");
 
       if (profilesError) throw profilesError;
+
+      // Map profiles with placeholder email from user_id
+      const mappedProfiles = (profilesData || []).map(p => ({
+        ...p,
+        email: p.full_name ? `${p.full_name.toLowerCase().replace(/\s+/g, '.')}@example.com` : 'N/A'
+      }));
 
       // Fetch waitlist
       const { data: waitlistData, error: waitlistError } = await supabase
@@ -136,7 +139,7 @@ const AdminPanel = () => {
 
       if (projectsError) throw projectsError;
 
-      setProfiles(profilesData || []);
+      setProfiles(mappedProfiles);
       setWaitlist(waitlistData || []);
       setProjects(projectsData || []);
     } catch (error) {

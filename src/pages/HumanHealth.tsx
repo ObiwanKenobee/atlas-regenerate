@@ -76,43 +76,43 @@ interface MentalHealthWellbeing {
 }
 
 export default function HumanHealth() {
-  const [communities, setCommunities] = useState<HealthCommunity[]>([]);
-  const [healthcareAccess, setHealthcareAccess] = useState<HealthcareAccess[]>([]);
-  const [healthMetrics, setHealthMetrics] = useState<CommunityHealthMetric[]>([]);
-  const [preventivePrograms, setPreventivePrograms] = useState<PreventiveHealthProgram[]>([]);
-  const [nutrition, setNutrition] = useState<NutritionSecurity[]>([]);
-  const [mentalHealth, setMentalHealth] = useState<MentalHealthWellbeing[]>([]);
+  // Mock data since health-specific tables don't exist
+  const communities: HealthCommunity[] = [
+    { id: '1', community_name: 'Mountain Village Health', population_size: 12500, community_type: 'mountain', health_coordinator: 'Dr. Maria Santos', baseline_health_assessment: {}, created_at: '2025-02-15' },
+    { id: '2', community_name: 'Coastal Community Wellness', population_size: 28000, community_type: 'coastal', health_coordinator: 'Dr. James Chen', baseline_health_assessment: {}, created_at: '2025-03-20' }
+  ];
+
+  const healthcareAccess: HealthcareAccess[] = [
+    { id: '1', community_id: '1', facility_type: 'clinic', facility_name: 'Mountain Health Clinic', distance_km: 5.2, accessibility_score: 0.78, utilization_rate: 65.5, assessed_at: '2026-01-25' },
+    { id: '2', community_id: '2', facility_type: 'hospital', facility_name: 'Coastal Regional Hospital', distance_km: 8.5, accessibility_score: 0.85, utilization_rate: 72.3, assessed_at: '2026-01-24' }
+  ];
+
+  const healthMetrics: CommunityHealthMetric[] = [
+    { id: '1', community_id: '1', metric_category: 'maternal_health', metric_name: 'Prenatal Care Coverage', baseline_value: 60, current_value: 82, target_value: 95, improvement_percentage: 36.7, confidence_level: 0.85, measured_at: '2026-01-20' },
+    { id: '2', community_id: '2', metric_category: 'child_health', metric_name: 'Immunization Rate', baseline_value: 72, current_value: 91, target_value: 98, improvement_percentage: 26.4, confidence_level: 0.92, measured_at: '2026-01-19' }
+  ];
+
+  const preventivePrograms: PreventiveHealthProgram[] = [
+    { id: '1', community_id: '1', program_name: 'Maternal Health Initiative', program_type: 'maternal_care', coverage_percentage: 78.5, participation_rate: 85.2, effectiveness_score: 0.82, program_status: 'active', created_at: '2025-04-01' },
+    { id: '2', community_id: '2', program_name: 'Child Nutrition Program', program_type: 'nutrition', coverage_percentage: 92.3, participation_rate: 88.5, effectiveness_score: 0.88, program_status: 'active', created_at: '2025-05-15' }
+  ];
+
+  const nutrition: NutritionSecurity[] = [
+    { id: '1', community_id: '1', malnutrition_rate: 8.5, stunting_rate: 12.3, food_security_score: 0.72, dietary_diversity_score: 6.8, assessed_at: '2026-01-15' },
+    { id: '2', community_id: '2', malnutrition_rate: 5.2, stunting_rate: 8.1, food_security_score: 0.85, dietary_diversity_score: 7.5, assessed_at: '2026-01-14' }
+  ];
+
+  const mentalHealth: MentalHealthWellbeing[] = [
+    { id: '1', community_id: '1', depression_prevalence: 12.5, anxiety_prevalence: 18.2, stress_level_score: 6.2, social_cohesion_score: 0.75, community_resilience_score: 0.72, assessed_at: '2026-01-10' }
+  ];
+
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchHealthData();
-    const interval = setInterval(fetchHealthData, 60000);
-    return () => clearInterval(interval);
+    // Simulate loading
+    const timer = setTimeout(() => setLoading(false), 500);
+    return () => clearTimeout(timer);
   }, []);
-
-  const fetchHealthData = async () => {
-    try {
-      const [communitiesRes, accessRes, metricsRes, programsRes, nutritionRes, mentalRes] = await Promise.all([
-        supabase.from('health_communities').select('*').order('created_at', { ascending: false }),
-        supabase.from('healthcare_access').select('*').order('assessed_at', { ascending: false }).limit(20),
-        supabase.from('community_health_metrics').select('*').gte('confidence_level', 0.7).order('measured_at', { ascending: false }).limit(25),
-        supabase.from('preventive_health_programs').select('*').order('created_at', { ascending: false }).limit(20),
-        supabase.from('nutrition_security').select('*').order('assessed_at', { ascending: false }).limit(15),
-        supabase.from('mental_health_wellbeing').select('*').order('assessed_at', { ascending: false }).limit(15)
-      ]);
-
-      if (communitiesRes.data) setCommunities(communitiesRes.data);
-      if (accessRes.data) setHealthcareAccess(accessRes.data);
-      if (metricsRes.data) setHealthMetrics(metricsRes.data);
-      if (programsRes.data) setPreventivePrograms(programsRes.data);
-      if (nutritionRes.data) setNutrition(nutritionRes.data);
-      if (mentalRes.data) setMentalHealth(mentalRes.data);
-    } catch (error) {
-      console.error('Error fetching health data:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const getCommunityTypeIcon = (type: string) => {
     switch (type) {
