@@ -5,8 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
-import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/hooks/useAuth";
+import { Label } from "@/components/ui/label";
 import { MapPin, CheckCircle, XCircle, Clock, FileText, Users, Eye } from "lucide-react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
@@ -31,7 +30,6 @@ interface ProjectDetails {
 }
 
 const ProjectVerification = () => {
-  const { user } = useAuth();
   // Mock data since restoration_projects and related tables don't exist
   const projects: RestorationProject[] = [
     { id: '1', project_name: 'Amazon Reforestation Initiative', project_type: 'forestry', total_area: 5000, location_description: 'Amazon Basin, Brazil', registration_status: 'submitted', created_at: '2026-01-15', practitioner_id: 'user1' },

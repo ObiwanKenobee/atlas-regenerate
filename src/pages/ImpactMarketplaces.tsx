@@ -53,6 +53,8 @@ interface ImpactRating {
   financial_score: number;
   rating_outlook: string;
   rating_date: string;
+  governance_score?: number;
+  risk_score?: number;
 }
 
 interface SecondaryMarket {
@@ -227,7 +229,7 @@ export default function ImpactMarketplaces() {
                       {getVentureTypeIcon(venture.venture_type)}
                       <span className="truncate">{venture.venture_name}</span>
                     </CardTitle>
-                    <Badge className={getStatusColor(venture.verification_status)} size="sm">
+                    <Badge className={getStatusColor(venture.verification_status)}>
                       {venture.verification_status}
                     </Badge>
                   </div>
@@ -279,7 +281,7 @@ export default function ImpactMarketplaces() {
                     <DollarSign className="h-4 w-4 sm:h-5 sm:w-5" />
                     <span className="truncate">{opportunity.opportunity_type.replace('_', ' ')} Investment</span>
                   </CardTitle>
-                  <Badge className={getStatusColor(opportunity.status)} size="sm">
+                  <Badge className={getStatusColor(opportunity.status)}>
                     {opportunity.status.replace('_', ' ')}
                   </Badge>
                 </div>

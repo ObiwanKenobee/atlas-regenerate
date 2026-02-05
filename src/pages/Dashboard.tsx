@@ -26,18 +26,17 @@ interface ImpactMetric {
 
 interface Project {
   id: string;
-  title: string;
+  project_name: string;
   description: string;
-  location: string;
+  location: any;
   funding_goal: number;
   funding_raised: number;
   project_type: string;
   status: string;
-  image_url: string;
 }
 
 interface Profile {
-  is_admin: boolean;
+  role: string | null;
 }
 
 const Dashboard = () => {
@@ -74,10 +73,10 @@ const Dashboard = () => {
       // Fetch user profile
       const { data: profileData } = await supabase
         .from("profiles")
-        .select("is_admin")
+        .select("role")
         .eq("user_id", user?.id)
-        .single();
-      if (profileData) setProfile(profileData);
+        .maybeSingle();
+      if (profileData) setProfile(profileData as Profile);
     } catch (error) {
       console.error("Error fetching data:", error);
     } finally {
@@ -187,7 +186,7 @@ const Dashboard = () => {
               <Globe className="w-5 h-5" />
               How It Works
             </a>
-            {profile?.is_admin && (
+            {profile?.role === 'admin' && (
               <a href="/admin" className="flex items-center gap-3 px-4 py-3 rounded-lg text-muted-foreground hover:bg-muted transition-colors">
                 <Settings className="w-5 h-5" />
                 Admin Panel
@@ -203,8 +202,8 @@ const Dashboard = () => {
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium truncate">{user?.email}</p>
-                <p className="text-xs text-muted-foreground">
-                  {profile?.is_admin ? "Admin" : "Member"}
+                <p className="text-xs text-muted-foreground capitalize">
+                  {profile?.role || "Member"}
                 </p>
               </div>
             </div>
@@ -299,10 +298,10 @@ const Dashboard = () => {
                           <Icon className="w-5 h-5 text-primary" />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <CardTitle className="text-lg line-clamp-1">{project.title}</CardTitle>
+                          <CardTitle className="text-lg line-clamp-1">{project.project_name}</CardTitle>
                           <div className="flex items-center gap-1 text-sm text-muted-foreground mt-1">
                             <MapPin className="w-3 h-3" />
-                            <span className="truncate">{project.location}</span>
+                            <span className="truncate">{typeof project.location === 'object' ? JSON.stringify(project.location) : project.location || 'N/A'}</span>
                           </div>
                         </div>
                         <Badge variant="outline" className="capitalize">

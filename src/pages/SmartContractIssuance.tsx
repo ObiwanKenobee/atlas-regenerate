@@ -200,9 +200,9 @@ export default function SmartContractIssuance() {
                 <div className="mt-4">
                   <p className="text-sm text-gray-600 mb-2">Stakeholder Shares</p>
                   <div className="flex flex-wrap gap-2">
-                    {Object.entries(contract.stakeholder_shares || {}).map(([role, share]) => (
+                    {Object.entries(contract.stakeholder_shares || {}).map(([role, share]: [string, unknown]) => (
                       <Badge key={role} variant="outline">
-                        {role}: {share}%
+                        {role}: {String(share)}%
                       </Badge>
                     ))}
                   </div>
