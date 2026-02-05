@@ -730,7 +730,7 @@ export default function RegenerativeAgriculture() {
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">
                     <CardTitle className="text-sm sm:text-base line-clamp-2">{practice.practice_name}</CardTitle>
-                    <Badge className={getStatusColor(practice.practice_status)} size="sm">
+                    <Badge className={getStatusColor(practice.practice_status)}>
                       {practice.practice_status}
                     </Badge>
                   </div>

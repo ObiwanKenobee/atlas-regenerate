@@ -23,7 +23,6 @@ interface Profile {
   email: string;
   organization: string;
   role: string;
-  is_admin: boolean;
   created_at: string;
 }
 
@@ -37,9 +36,9 @@ interface WaitlistEntry {
 
 interface Project {
   id: string;
-  title: string;
+  project_name: string;
   description: string;
-  location: string;
+  location: any;
   funding_goal: number;
   funding_raised: number;
   project_type: string;
@@ -87,13 +86,13 @@ const AdminPanel = () => {
     try {
       const { data, error } = await supabase
         .from("profiles")
-        .select("is_admin")
+        .select("role")
         .eq("user_id", user.id)
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
       
-      if (!data?.is_admin) {
+      if (data?.role !== 'admin') {
         toast.error("Access denied. Admin privileges required.");
         navigate("/dashboard");
         return;
@@ -150,14 +149,15 @@ const AdminPanel = () => {
 
   const toggleAdminStatus = async (profileId: string, currentStatus: boolean) => {
     try {
+      const newRole = currentStatus ? 'practitioner' : 'admin';
       const { error } = await supabase
         .from("profiles")
-        .update({ is_admin: !currentStatus })
+        .update({ role: newRole })
         .eq("id", profileId);
 
       if (error) throw error;
       
-      toast.success(`Admin status ${!currentStatus ? "granted" : "revoked"} successfully`);
+      toast.success(`Admin status ${newRole === 'admin' ? "granted" : "revoked"} successfully`);
       fetchData();
     } catch (error) {
       console.error("Error updating admin status:", error);
@@ -186,17 +186,15 @@ const AdminPanel = () => {
     try {
       const { error } = await supabase
         .from("projects")
-        .insert({
-          title: newProject.title,
+        .insert([{
+          project_name: newProject.title,
+          owner_id: user?.id,
           description: newProject.description,
-          location: newProject.location,
-          latitude: parseFloat(newProject.latitude) || null,
-          longitude: parseFloat(newProject.longitude) || null,
-          funding_goal: parseFloat(newProject.funding_goal),
+          location: { address: newProject.location, lat: parseFloat(newProject.latitude) || null, lng: parseFloat(newProject.longitude) || null },
+          funding_goal: parseFloat(newProject.funding_goal) || 0,
           project_type: newProject.project_type,
-          image_url: newProject.image_url,
           status: "active"
-        });
+        }]);
 
       if (error) throw error;
       
@@ -300,17 +298,17 @@ const AdminPanel = () => {
                         <TableCell>{profile.organization || "N/A"}</TableCell>
                         <TableCell>{profile.role || "N/A"}</TableCell>
                         <TableCell>
-                          <Badge variant={profile.is_admin ? "default" : "secondary"}>
-                            {profile.is_admin ? "Yes" : "No"}
+                          <Badge variant={profile.role === 'admin' ? "default" : "secondary"}>
+                            {profile.role === 'admin' ? "Yes" : "No"}
                           </Badge>
                         </TableCell>
                         <TableCell>
                           <Button
                             size="sm"
                             variant="outline"
-                            onClick={() => toggleAdminStatus(profile.id, profile.is_admin)}
+                            onClick={() => toggleAdminStatus(profile.id, profile.role === 'admin')}
                           >
-                            {profile.is_admin ? "Revoke Admin" : "Grant Admin"}
+                            {profile.role === 'admin' ? "Revoke Admin" : "Grant Admin"}
                           </Button>
                         </TableCell>
                       </TableRow>
@@ -481,8 +479,8 @@ const AdminPanel = () => {
                   <TableBody>
                     {projects.map((project) => (
                       <TableRow key={project.id}>
-                        <TableCell className="font-medium">{project.title}</TableCell>
-                        <TableCell>{project.location}</TableCell>
+                        <TableCell className="font-medium">{project.project_name}</TableCell>
+                        <TableCell>{typeof project.location === 'object' ? (project.location?.address || 'N/A') : project.location || 'N/A'}</TableCell>
                         <TableCell>
                           <Badge variant="outline" className="capitalize">
                             {project.project_type}
