@@ -50,6 +50,7 @@ import SystemMonitoring from "./pages/SystemMonitoring";
 import NewsletterAdmin from "./pages/NewsletterAdmin";
 import RegenerativeSystemsDashboard from "./pages/RegenerativeSystemsDashboard";
 import CivilizationalArchitecture from "./pages/CivilizationalArchitecture";
+import ProjectDetail from "./pages/ProjectDetail";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient({
@@ -119,6 +120,7 @@ const App = () => (
               <Route path="/health" element={<><EcosystemNavigation /><div className="md:ml-80"><HumanHealth /></div></>} />
               <Route path="/circular" element={<><EcosystemNavigation /><div className="md:ml-80"><CircularBioeconomy /></div></>} />
               <Route path="/invest" element={<ImpactMarketplaces />} />
+              <Route path="/project/:id" element={<ProjectDetail />} />
               
               <Route path="*" element={<NotFound />} />
             </Routes>
